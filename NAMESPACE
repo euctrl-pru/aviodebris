@@ -2,4 +2,5 @@
 
 export(kepler_to_cartesian)
 export(latitude_weights)
+export(resample_traffic)
 importFrom(rlang,.data)
