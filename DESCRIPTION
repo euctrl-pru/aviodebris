@@ -20,7 +20,9 @@ LazyData: true
 RoxygenNote: 7.3.2
 Imports: 
     arrow,
+    DBI,
     dplyr,
+    duckdb,
     here,
     lubridate,
     purrr,
@@ -28,4 +30,5 @@ Imports:
     stringr,
     tibble,
     tidyr,
-    trrrj
+    trrrj,
+    withr
