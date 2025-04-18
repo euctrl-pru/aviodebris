@@ -4,13 +4,15 @@
 \alias{traffic_density_hourly}
 \title{Calculated the hourly traffic density per aircraft type}
 \usage{
-traffic_density_hourly(days, resolution)
+traffic_density_hourly(days, resolution = 3L, interval = 30L)
 }
 \arguments{
 \item{days}{a vector of dates which correspond to parquet files
-in `data/trajectories_<YYYY-MM-DD>_resampled_30s_bbox_res_<resolution>.parquet`}
+in `data/trajectories_<YYYY-MM-DD>_resampled_<interval>s_bbox_res_<resolution>.parquet`}
 
 \item{resolution}{the resolution of the H3 hexagonal cells}
+
+\item{interval}{resampling interval}
 }
 \value{
 save the result in a parquet file `traffic_density_hourly.parquet`

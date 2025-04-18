@@ -5,13 +5,14 @@
 #' @param day the date for the trajectories, it refers to the relevant
 #'            parquet file in `data/trajectories_<YYYY-MM-DD>_resampled_30s.parquet`
 #' @param resolution the H3 resolution
+#' @param interval resampling interval
 #'
 #' @export
 #'
 #' @returns a new parquet file such as
 #'          `data/trajectories_<YYYY-MM-DD>_resampled_30s_bbox_res_<resolution>.parquet`
 #'
-hexagonize_traffic <- function(day, resolution = 3) {
+hexagonize_traffic <- function(day, resolution = 3L, interval = 30L) {
   date <- day |> lubridate::as_date()
   year <- lubridate::year(date)
   month <- lubridate::month(date)
@@ -40,7 +41,7 @@ hexagonize_traffic <- function(day, resolution = 3) {
       h3_h3_to_string(h3_latlng_to_cell(latitude, longitude, {resolution})) AS cell,
       {resolution} AS h3_resolution
     FROM
-        'data/trajectories_{date}_resampled_30s.parquet';
+        'data/trajectories_{date}_resampled_{interval}s.parquet';
     ALTER TABLE TRAJECTORY DROP COLUMN sequence_id;
     ALTER TABLE TRAJECTORY RENAME seq_id TO sequence_id;
     COPY(
@@ -59,7 +60,7 @@ hexagonize_traffic <- function(day, resolution = 3) {
         AND (year = {year} AND month = {month} AND day = {day})
     )
     TO
-      'data/trajectories_{date}_resampled_30s_bbox_res_{resolution}.parquet'
+      'data/trajectories_{date}_resampled_{interval}s_bbox_res_{resolution}.parquet'
     (FORMAT 'parquet')
     ;")
 

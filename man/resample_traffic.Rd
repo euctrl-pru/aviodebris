@@ -4,11 +4,13 @@
 \alias{resample_traffic}
 \title{reasample a day of trajectories at 30s}
 \usage{
-resample_traffic(day)
+resample_traffic(day, interval = 30L)
 }
 \arguments{
 \item{day}{the date for the trajectories, it refers to the relevant
 parquet file in `data-raw/trjs/trjs_<YYYY-MM-DD>.parquet`}
+
+\item{interval}{number of seconds between samples [30]}
 }
 \value{
 a data frame of resampled points is saved in

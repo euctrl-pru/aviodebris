@@ -4,13 +4,15 @@
 \alias{hexagonize_traffic}
 \title{assign H3 cell index at specified resolution to all trajectory point}
 \usage{
-hexagonize_traffic(day, resolution = 3)
+hexagonize_traffic(day, resolution = 3L, interval = 30L)
 }
 \arguments{
 \item{day}{the date for the trajectories, it refers to the relevant
 parquet file in `data/trajectories_<YYYY-MM-DD>_resampled_30s.parquet`}
 
 \item{resolution}{the H3 resolution}
+
+\item{interval}{resampling interval}
 }
 \value{
 a new parquet file such as

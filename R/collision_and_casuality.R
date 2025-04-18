@@ -6,10 +6,15 @@
 #' @returns save the result in a parquet file `collision_and_casuality_hourly.parquet`
 #' @export
 #'
-collision_and_casuality_risk_expectation_hourly <- function(days, resolution) {
+collision_and_casuality_risk_expectation_hourly <- function(
+  days,
+  resolution = 3L
+) {
   hourly_weights_h3_resolution_3 <- here::here(
     "data",
-    "weightings_h3__resolution_3_hourly_2000-01-01_2025-01-01.csv"
+    stringr::str_glue(
+      "weightings_h3_resolution_{resolution}_hourly_2000-01-01_2025-01-01.csv"
+    )
   ) |>
     readr::read_csv()
 
@@ -27,10 +32,10 @@ collision_and_casuality_risk_expectation_hourly <- function(days, resolution) {
   arrow::read_parquet(
     here::here("data", "traffic_density_hourly.parquet")
   ) |>
-    dplyr::filter(.data$h3_resolution == 3) |>
+    dplyr::filter(.data$h3_resolution == resolution) |>
     dplyr::left_join(
       hourly_weights_h3_resolution_3,
-      by = c("cell" = "h3_resolution_3")
+      by = c("cell" = stringr::str_glue("h3_resolution_{resolution}"))
     ) |>
     dplyr::left_join(effective_expose_area, by = c("aircraft_type" = "icao")) |>
     dplyr::mutate(
