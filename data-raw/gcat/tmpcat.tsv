@@ -1,0 +1,25 @@
+#JCAT	Satcat	Launch_Tag	Piece	Type	Name	PLName	LDate	Parent	SDate	Primary	DDate	Status	Dest	Owner	State	Manufacturer	Bus	Motor	Mass	MassFlag	DryMass	DryFlag	TotMass	TotFlag	Length	LFlag	Diameter	DFlag	Span	SpanFlag	Shape	ODate	Perigee	PF	Apogee	AF	Inc	IF	OpOrbit	OQUAL	AltNames
+# Updated 2025 Mar  2  1751:37
+T00001	NNA	2023-210   202	2023-210C	C  A        	OTV-7 Service Module	X-37B Service Module	2023 Dec 29	S58666	2023 Dec 29	Earth	-	AO	-	AFRCO	US	BOHB?	OTV-SM	-	     500 	?	    500 	?	     500 	?	   0.5 	?	  2.9 	 	    3.0 	?	Annulus	-	       0	 	       0	 	  0.00 	 	-	-	-
+T00002	NNA	2025-038   202	2025-038	P   D       	Unk Cubesat?	Cubesat	2025 Feb 27	S63102	2025 Feb 27 0105	Earth	-	AO	-	UNKUS	US	UNKUS	Cubesat 16U	-	      20 	?	     20 	?	      20 	?	   0.4 	 	  0.4 	 	    0.4 	 	Box	-	       0	 	       0	 	  0.00 	 	-	-	-
+T00003	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-
+T00004	NNA A	2025-009   202	2025-009DS	P           	PoSAT-2	Posat-2	2025 Jan 14	S62628	2025 Jan 14 2012:58	Earth	-	AO	-	LUSO	P	LUSO	Cubesat 3U	-	       5 	 	      5 	 	       5 	 	   0.3 	 	  0.1 	 	    0.5 	 	Box+ 2 pan	-	       0	 	       0	 	  0.00 	 	-	-	-
+T00005	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-
+T00006	NNA A	2025-009   202	2025-009DR	P           	Skylink-2	Skylink-2	2025 Jan 14	S62630	2025 Jan 22?	Earth	-	O	-	HELLO	TR	HELLO	PocketQube 3P	-	       0.750	 	      0.750	 	       0.750	 	   0.150	 	  0.050	 	    0.350	 	Box+ 2 pan	2025 Feb 13	     510	 	     513	 	 97.36 	 	LLEO/S	-	-
+T00007	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-
+T00008	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-
+T00009	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-
+T00010	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-
+T00011	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-
+T00012	NNA A	2024-178   202	2024-178B	C  A T      	Dragon Trunk	Dragon D2-26 Trunk	2024 Sep 28	S61447	2024 Sep 28 1719:21	Earth	-	AO	-	SPX	US	SPX	Dragon SM	-	    2300 	?	   2300 	?	       0 	 	   3.7 	 	  3.7 	 	    3.7 	 	Cyl	-	       0	 	       0	 	  0.00 	 	-	-	-
+T00013	NNA	2024-194   202	2024-194	CP T T      	Shenzhou 19 Guidao Cang	Shenzhou 19 orbital module	2024 Oct 29	S61683	2024 Oct 29 2036	Earth	-	AO	-	CMSEO	CN	CAST	Shenzhou OM	-	    1842 	?	   1500 	?	    1842 	?	   2.3 	 	  2.8 	 	    4.3 	 	Cyl + 2 pan	-	       0	 	       0	 	  0.00 	 	-	-	-
+T00014	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-
+T00015	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-
+T00016	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-
+T00017	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-
+T00018	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-
+T00019	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-
+T00020	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-
+T00021	NNA A	2025-009   202	2025-009DT	P           	Sedna-2	Sedna-2	2025 Jan 14	S62630	2025 Jan 14 2013	Earth	-	AO	-	CLAAC	UK	CLAAC	Cubesat 1x4U	-	      10 	?	     10 	?	      10 	?	   0.4 	 	  0.1 	 	    0.4 	 	Box	-	       0	 	       0	 	  0.00 	 	-	-	-
+T00022	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-
+T00023	NNA	2024-043   202	2024-043	P       ?   	Gluon	Gluon	2024 Mar  4	S59119	2024 Mar  4 2318:43	Earth	-	AO	-	ATOMOS	US	ATOMOS	Atomos	-	     100 	?	    100 	?	     100 	?	   0.5 	 	  1.0 	 	    1.0 	 	Box + 2 pan	-	       0	 	       0	 	  0.00 	 	-	-	-
