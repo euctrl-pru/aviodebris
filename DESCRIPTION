@@ -1,7 +1,7 @@
 Package: aviodebris
 Type: Package
 Title: Estimate impact of space debris reentries on aviation
-Version: 0.1.2
+Version: 0.1.3
 Authors@R: 
     c(person(given = "Enrico",
              family = "Spinielli",
@@ -23,11 +23,16 @@ Imports:
     DBI,
     dplyr,
     duckdb,
+    ggplot2,
+    giscoR,
+    h3jsr,
     here,
     lubridate,
     purrr,
     readr,
     rlang,
+    sf,
+    smoothr,
     stringr,
     tibble,
     tidyr,
