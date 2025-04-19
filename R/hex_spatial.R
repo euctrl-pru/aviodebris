@@ -72,11 +72,11 @@ plot_hexes_map <- function(resolution) {
 
   eur_hex_union <- bbox_nm() |>
     # hex union at res 2
-    hexes_for_bbox_at_res(resolution = 2) |>
+    hexes_for_bbox_at_res(resolution = resolution) |>
     sf::st_union() |>
     sf::st_exterior_ring() |>
     sf::st_as_sf() |>
-    dplyr::mutate(resolution = 2)
+    dplyr::mutate(resolution = resolution)
 
   eur_centreoid <- eur_hex |>
     dplyr::pull(.data$h3_address) |>
