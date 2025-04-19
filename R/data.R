@@ -29,3 +29,45 @@
 #' @source <https://planet4589.org/space/gcat>
 #'
 "reentries_gcat"
+
+
+#' Debris weighting function per latitude
+#'
+#' weighting functions for reentered debris in 25 years from
+#' 2000-01-01 till 2025-01-01 (excluded), at half degree resolution.
+#'
+#' @format ## `weightings_half_degree_latitude`
+#' A data frame with 360 rows (latitude from -90 to 90 at half degree)
+#' and 2 columns:
+#' * `lat`: the latitude.
+#' * `val`: the value of the weighting function.
+#'
+"weightings_half_degree_latitude"
+
+
+#' Debris weighting function for half degree grid
+#'
+#' Hourly weighting functions for reentered debris in 25 years from
+#' 2000-01-01 till 2025-01-01 (excluded), at half degree resolution
+#' worldwide.
+#'
+#' @format ## `weightings_half_degree_hourly`
+#' A data frame with 360 * 720 rows and 3 columns:
+#' * `lon`: the longitude.
+#' * `lat`: the latitude.
+#' * `val`: the value of the hourly weighting function.
+#'
+"weightings_half_degree_hourly"
+
+
+#' Debris hourly density function per H3 hex cell at resolution 3
+#'
+#' Hourly weighting functions for reentered debris in 25 years from
+#' 2000-01-01 till 2025-01-01 (excluded), for H3 cells at resolution 3.
+#'
+#' @format ## `weightings_half_degree_hourly`
+#' A data frame with 360 * 720 rows and 1 column:
+#' * `h3_resolution_3`: the H3 cell id
+#' * `w`: the value of the hourly weighting function.
+#'
+"weightings_h3_resolution_3_hourly"
