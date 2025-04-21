@@ -50,12 +50,12 @@ hexagonize_traffic <- function(day, resolution = 3L, interval = 30L) {
       FROM
         TRAJECTORY
       WHERE
-        -- filter on bounding box (the one containing all HEX cells containing NM area)
-        -- xmin = -27.78166, ymin = 24.90098,
-        -- xmax =  48.56037, ymax = 72.85065
+        -- filter on bounding box (all HEX cells at res 3 containing NM area)
+        -- xmin = -27.04161, ymin = 25.98853,
+        -- xmax =  46.60269, ymax = 72.31645
         (
-          (-27.78166 <= longitude AND longitude < 48.56037)
-            AND (24.90098 <= latitude AND latitude < 72.85065)
+          (-27.04161 <= longitude AND longitude < 46.60269)
+            AND (25.98853 <= latitude AND latitude < 72.31645)
         )
         AND (year = {year} AND month = {month} AND day = {day})
     )
