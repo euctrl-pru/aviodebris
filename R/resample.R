@@ -12,9 +12,11 @@
 #'
 resample_traffic <- function(day, interval = 30L) {
   date <- day |> lubridate::as_date()
-  stringr::str_glue(
-    "data-raw/trjs/trjs_{date}.parquet",
-    date = format(date, "%Y-%m-%d")
+
+  here::here(
+    "data-raw",
+    "trjs",
+    stringr::str_glue("trjs_{date}.parquet", date = format(date, "%Y-%m-%d"))
   ) |>
     arrow::read_parquet() |>
     dplyr::select(-c("callsign", "icao24")) |>
