@@ -18,10 +18,10 @@ traffic_density_hourly <- function(days, resolution = 3L, interval = 30L) {
     purrr::map(.f = arrow::read_parquet) |>
     dplyr::bind_rows() |>
     dplyr::summarise(
-      # NOTE: `30` is because of sampling at 30s
       # NOTE: of course 3600 are the seconds in 1 hour
       # occupancy of the cell is 30s the number of trajectory points
-      # (last point could be less than 30s away, so we are slightly overestimating)
+      # (last point could be less than `interval` seconds away,
+      # so we are slightly overestimating)
       occupancy = dplyr::n() * interval / 3600,
       .by = c(
         .data$year,
