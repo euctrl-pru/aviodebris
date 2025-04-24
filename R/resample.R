@@ -23,6 +23,6 @@ resample_traffic <- function(day, interval = 30L) {
     trrrj::resample(interval) |>
     arrow::write_parquet(here::here(
       "data",
-      stringr::str_glue("trajectories_2023-09-01_resampled_{interval}s.parquet")
+      stringr::str_glue("trajectories_{date}_resampled_{interval}s.parquet")
     ))
 }
