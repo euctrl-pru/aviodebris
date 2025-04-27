@@ -41,7 +41,7 @@ collision_and_casuality_risk_expectation_hourly <- function(
       pax = dplyr::if_else(is.na(.data$pax), 10, .data$pax)
     ) |>
     dplyr::mutate(
-      collision_expectation = .data$.data$w * .data$occupancy * .data$eea,
+      collision_expectation = .data$w * .data$occupancy * .data$eea,
       casuality_risk = .data$collision_expectation * .data$pax,
       .by = c("year", "month", "day", "hour", "cell", "aircraft_type")
     ) |>
