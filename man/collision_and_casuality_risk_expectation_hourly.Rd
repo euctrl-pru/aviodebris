@@ -4,10 +4,10 @@
 \alias{collision_and_casuality_risk_expectation_hourly}
 \title{Calculate hourly collision and casuality risk expectation}
 \usage{
-collision_and_casuality_risk_expectation_hourly(days, resolution = 3L)
+collision_and_casuality_risk_expectation_hourly(day, resolution = 3L)
 }
 \arguments{
-\item{days}{dates to calculate for}
+\item{day}{date to calculate for}
 
 \item{resolution}{H3 hex resolution}
 }

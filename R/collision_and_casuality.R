@@ -1,22 +1,16 @@
 #' Calculate hourly collision and casuality risk expectation
 #'
-#' @param days dates to calculate for
+#' @param day date to calculate for
 #' @param resolution H3 hex resolution
 #'
 #' @returns save the result in a parquet file `collision_and_casuality_hourly.parquet`
 #' @export
 #'
 collision_and_casuality_risk_expectation_hourly <- function(
-  days,
+  day,
   resolution = 3L
 ) {
-  hourly_weights_h3_resolution_3 <- here::here(
-    "data",
-    stringr::str_glue(
-      "weightings_h3_resolution_{resolution}_hourly_2000-01-01_2025-01-01.csv"
-    )
-  ) |>
-    readr::read_csv()
+  date <- day |> lubridate::as_date()
 
   ac_types <- readr::read_csv(here::here("data", "aircraft_type_info.csv"))
   effective_expose_area <- ac_types |>
@@ -34,7 +28,7 @@ collision_and_casuality_risk_expectation_hourly <- function(
   ) |>
     dplyr::filter(.data$h3_resolution == resolution) |>
     dplyr::left_join(
-      hourly_weights_h3_resolution_3,
+      aviodebris::weightings_h3_resolution_3_hourly,
       by = c("cell" = stringr::str_glue("h3_resolution_{resolution}"))
     ) |>
     dplyr::left_join(effective_expose_area, by = c("aircraft_type" = "icao")) |>
