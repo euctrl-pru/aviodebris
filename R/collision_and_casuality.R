@@ -12,8 +12,7 @@ collision_and_casuality_risk_expectation_hourly <- function(
 ) {
   date <- day |> lubridate::as_date()
 
-  ac_types <- readr::read_csv(here::here("data", "aircraft_type_info.csv"))
-  effective_expose_area <- ac_types |>
+  effective_expose_area <- aviodebris::aircraft_types |>
     dplyr::mutate(
       eea = ((.data$cruise_tas_kt * .data$wing_span_m * .data$height_m) +
         (145 * .data$wing_span_m * .data$length_m)) /
@@ -24,7 +23,12 @@ collision_and_casuality_risk_expectation_hourly <- function(
     dplyr::select("icao", "eea", "pax")
 
   arrow::read_parquet(
-    here::here("data", "traffic_density_hourly.parquet")
+    here::here(
+      "data",
+      stringr::str_glue(
+        "traffic_density_{date}_res_{resolution}_hourly.parquet"
+      )
+    )
   ) |>
     dplyr::filter(.data$h3_resolution == resolution) |>
     dplyr::left_join(
@@ -42,7 +46,12 @@ collision_and_casuality_risk_expectation_hourly <- function(
       .by = c("year", "month", "day", "hour", "cell", "aircraft_type")
     ) |>
     arrow::write_parquet(
-      here::here("data", "collision_and_casuality_hourly.parquet"),
+      here::here(
+        "data",
+        stringr::str_glue(
+          "collision_and_casuality_{date}_res_{resolution}_hourly.parquet"
+        )
+      ),
       compression = "gzip"
     )
 }
