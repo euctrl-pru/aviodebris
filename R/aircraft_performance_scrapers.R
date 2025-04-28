@@ -18,6 +18,19 @@
 #'   bind_rows()
 #' }
 scrape_aircraft_type_info_perfdb <- function(ac_type, session) {
+  make_valid <- function(value) {
+    value <- ifelse(
+      length(value) == 0,
+      NA_real_,
+      value
+    )
+    value <- ifelse(
+      value == "no data",
+      NA_real_,
+      value
+    )
+    value
+  }
   # For some verbose status updates
   cli::cli_process_start(
     "Scrape {.val {ac_type}} at EUROCONTROL Performance DB"
@@ -46,14 +59,14 @@ scrape_aircraft_type_info_perfdb <- function(ac_type, session) {
       type           = NA_character_,
       wtc            = NA_character_,
       recat_eu       = NA_character_,
-      mtow_kg        = NA,
-      cruise_tas_kt  = NA,
-      cruise_mach    = NA,
-      cruise_range_nm   = NA,
-      cruise_ceiling_fl = NA,
-      wing_span_m      = NA,
-      length_m         = NA,
-      height_m         = NA,
+      mtow_kg        = NA_real_,
+      cruise_tas_kt  = NA_real_,
+      cruise_mach    = NA_real_,
+      cruise_range_nm   = NA_real_,
+      cruise_ceiling_fl = NA_real_,
+      wing_span_m      = NA_real_,
+      length_m         = NA_real_,
+      height_m         = NA_real_,
       accomodation   = NA_character_
     )
   } else {
@@ -83,11 +96,13 @@ scrape_aircraft_type_info_perfdb <- function(ac_type, session) {
 
     cruise_tas_kt <- page |>
       rvest::html_elements("#wsVCSknotsLiteral") |>
-      rvest::html_text2()
+      rvest::html_text2() |>
+      as.numeric()
 
     cruise_mach <- page |>
       rvest::html_elements("#wsVCSmachLiteral") |>
-      rvest::html_text2()
+      rvest::html_text2() |>
+      make_valid()
 
     cruise_range_nm <- page |>
       rvest::html_elements("#wsRangeLiteral") |>
@@ -196,14 +211,14 @@ scrape_aircraft_type_info_skybrary <- function(ac_type, session) {
       type              = NA_character_,
       wtc               = NA_character_,
       recat_eu          = NA_character_,
-      mtow_kg           = NA,
-      cruise_tas_kt     = NA,
-      cruise_mach       = NA,
-      cruise_range_nm   = NA,
-      cruise_ceiling_fl = NA,
-      wing_span_m       = NA,
-      length_m          = NA,
-      height_m          = NA,
+      mtow_kg           = NA_real_,
+      cruise_tas_kt     = NA_real_,
+      cruise_mach       = NA_real_,
+      cruise_range_nm   = NA_real_,
+      cruise_ceiling_fl = NA_real_,
+      wing_span_m       = NA_real_,
+      length_m          = NA_real_,
+      height_m          = NA_real_,
       accomodation      = NA_character_
     )
   } else {
@@ -253,7 +268,8 @@ scrape_aircraft_type_info_skybrary <- function(ac_type, session) {
     cruise_mach <- page |>
       rvest::html_elements(path) |>
       rvest::html_text2() |>
-      make_valid()
+      make_valid() |>
+      as.numeric()
 
     path <- ".field-node-field-performance-cruise-range.field-name-field-performance-cruise-range.field-type-integer.field-label-above.has-single > div.field-items > div"
     cruise_range_nm <- page |>
