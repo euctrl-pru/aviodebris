@@ -92,7 +92,8 @@ scrape_aircraft_type_info_perfdb <- function(ac_type, session) {
 
     mtow_kg <- page |>
       rvest::html_elements("#wsMTOWLiteral") |>
-      rvest::html_text2()
+      rvest::html_text2() |>
+      as.numeric()
 
     cruise_tas_kt <- page |>
       rvest::html_elements("#wsVCSknotsLiteral") |>
@@ -102,15 +103,18 @@ scrape_aircraft_type_info_perfdb <- function(ac_type, session) {
     cruise_mach <- page |>
       rvest::html_elements("#wsVCSmachLiteral") |>
       rvest::html_text2() |>
-      make_valid()
+      make_valid() |>
+      as.numeric()
 
     cruise_range_nm <- page |>
       rvest::html_elements("#wsRangeLiteral") |>
-      rvest::html_text2()
+      rvest::html_text2() |>
+      as.numeric()
 
     cruise_ceiling_fl <- page |>
       rvest::html_elements("#wsCeilingLiteral") |>
-      rvest::html_text2()
+      rvest::html_text2() |>
+      as.numeric()
 
     wing_span_m <- page |>
       rvest::html_elements("#MainContent_wsLabelWingSpan") |>

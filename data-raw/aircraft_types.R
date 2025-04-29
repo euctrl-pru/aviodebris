@@ -12,12 +12,14 @@ missing_cruise_speed <- readr::read_csv(here::here(
   "acts_missing_cruise_tas.csv"
 ))
 
+
 #---- scrape aircraft info ----
 if (FALSE) {
   library(arrow)
   library(aviodebris)
   library(polite)
-  source("R/act_passengers.R")
+
+  source(here::here("data-raw", "aircraft_types", "act_passengers.R"))
 
   # read traffic data and extract all aircraft types
   extract_aircraft_types <- function(fns, aircraft_type_columns) {
@@ -62,7 +64,7 @@ if (FALSE) {
       ),
       as.numeric
     )) |>
-    left_join(act_all_pax) |>
+    left_join(all_pax) |>
     mutate(pax = crew + pax_max) |>
     select(-c("accomodation", "crew", "pax_min", "pax_typical", "pax_max")) |>
     write_csv("data/ectrl_acts.csv")
@@ -86,7 +88,7 @@ if (FALSE) {
 
   acts_sky |>
     filter(!icao %in% acts_sky_missing) |>
-    left_join(sky_pax) |>
+    left_join(all_pax) |>
     mutate(pax = crew + pax_max) |>
     select(-c("accomodation", "crew", "pax_min", "pax_typical", "pax_max")) |>
     write_csv("data/sky_acts.csv")
@@ -132,7 +134,9 @@ if (FALSE) {
     select(-other)
 
   acts_doc8643 |>
-    rename(pax = accomodation) |>
+    left_join(all_pax) |>
+    mutate(pax = crew + pax_max) |>
+    select(-accomodation) |>
     write_csv("data/doc8643_acts.csv")
 }
 
