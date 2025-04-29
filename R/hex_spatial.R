@@ -3,14 +3,29 @@
 #' @export
 #' @returns bounding box for NM area
 bbox_nm <- function() {
-  # bbox Europe/EUROCONTROL area
-  # -25.488281,26.638253,45.407181,71.864780
+  # bbox Europe/EUROCONTROL area derived from:
+  # ms <- "BI|E.|L.|UD|UG|GM|UK|GC"
+  # fir_ctry <- country_fir(
+  #   firs = pruatlas::firs_nm_406,
+  #   icao_id = "BI|E.|L.|UD|UG|GM|UK|GC",
+  #   fl = 200,
+  #   merge = TRUE
+  # ) |>
+  #   sf::st_transform(crs = sf::st_crs(3035))
+  #
+  # bbox <- fir_ctry |>
+  #   sf::st_convex_hull() |>
+  #   sf::st_buffer(1000) |>
+  #   sf::st_transform(crs = sf::st_crs(4326)) |>
+  #   sf::st_bbox()
+
+  # -40.01297  16.99059  46.76206  82.00901
   # fmt: skip
   c(
-    xmin = -25.488281,
-    ymin =  26.638253,
-    xmax =  45.407181,
-    ymax =  71.864780
+    xmin = -40.01297,
+    ymin =  16.99059,
+    xmax =  46.76206,
+    ymax =  82.00901
   )
 }
 
