@@ -541,8 +541,7 @@ scrape_aircraft_type_info_doc8643 <- function(ac_type, session) {
     path <- "body > div:nth-child(2) > div > div.col-md-8 > div.container.tech-data > div:nth-child(7) > div.col-2.ps-1.pe-0"
     accomodation <- page |>
       rvest::html_elements(path) |>
-      rvest::html_text2() |>
-      as.numeric()
+      rvest::html_text2()
 
     # fmt: skip
     response <- tibble::tibble_row(

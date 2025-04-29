@@ -46,6 +46,22 @@ if (FALSE) {
   # some aircraft types will be missing, i.e. helicopters
   acts_perfdb <- types_all |>
     map(.f = scraper) |>
+    purrr::map(.f = function(df) {
+      df |>
+        mutate(across(
+          c(
+            "mtow_kg",
+            "cruise_tas_kt",
+            "cruise_mach",
+            "cruise_range_nm",
+            "cruise_ceiling_fl",
+            "wing_span_m",
+            "length_m",
+            "height_m"
+          ),
+          as.numeric
+        ))
+    }) |>
     bind_rows()
 
   mising_acts_perfdb <- acts_perfdb |>
@@ -54,19 +70,9 @@ if (FALSE) {
 
   acts_perfdb_clean <- acts_perfdb |>
     filter(!icao %in% mising_acts_perfdb) |>
-    mutate(across(
-      c(
-        "mtow_kg",
-        "cruise_tas_kt",
-        "cruise_mach",
-        "cruise_range_nm",
-        "cruise_ceiling_fl"
-      ),
-      as.numeric
-    )) |>
     left_join(all_pax) |>
-    mutate(pax = crew + pax_max) |>
-    select(-c("accomodation", "crew", "pax_min", "pax_typical", "pax_max")) |>
+    mutate(pax = crew + seats_max) |>
+    select(-c("accomodation", "crew", "seats_typical", "seats_max")) |>
     write_csv("data/ectrl_acts.csv")
 
   # ---- SkyBrary aircraft pages ----
@@ -78,8 +84,24 @@ if (FALSE) {
   )
 
   # scrape only missing type from perf DB
-  acts_sky <- all_acts_missing |>
+  acts_sky <- mising_acts_perfdb |>
     map(.f = scraper) |>
+    purrr::map(.f = function(df) {
+      df |>
+        mutate(across(
+          c(
+            "mtow_kg",
+            "cruise_tas_kt",
+            "cruise_mach",
+            "cruise_range_nm",
+            "cruise_ceiling_fl",
+            "wing_span_m",
+            "length_m",
+            "height_m"
+          ),
+          as.numeric
+        ))
+    }) |>
     bind_rows()
 
   acts_sky_missing <- acts_sky |>
@@ -89,8 +111,8 @@ if (FALSE) {
   acts_sky |>
     filter(!icao %in% acts_sky_missing) |>
     left_join(all_pax) |>
-    mutate(pax = crew + pax_max) |>
-    select(-c("accomodation", "crew", "pax_min", "pax_typical", "pax_max")) |>
+    mutate(pax = crew + seats_max) |>
+    select(-c("accomodation", "crew", "seats_typical", "seats_max")) |>
     write_csv("data/sky_acts.csv")
 
   # ---- doc8643.com ----
@@ -103,6 +125,22 @@ if (FALSE) {
 
   acts_doc8643 <- acts_sky_missing |>
     map(.f = scraper) |>
+    purrr::map(.f = function(df) {
+      df |>
+        mutate(across(
+          c(
+            "mtow_kg",
+            "cruise_tas_kt",
+            "cruise_mach",
+            "cruise_range_nm",
+            "cruise_ceiling_fl",
+            "wing_span_m",
+            "length_m",
+            "height_m"
+          ),
+          as.numeric
+        ))
+    }) |>
     bind_rows() |>
     mutate(
       type = case_when(
@@ -135,7 +173,7 @@ if (FALSE) {
 
   acts_doc8643 |>
     left_join(all_pax) |>
-    mutate(pax = crew + pax_max) |>
+    mutate(pax = crew + seats_max) |>
     select(-accomodation) |>
     write_csv("data/doc8643_acts.csv")
 }
