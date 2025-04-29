@@ -171,6 +171,10 @@ if (FALSE) {
     ) |>
     select(-other)
 
+  acts_doc8643_missing <- acts_doc8643 |>
+    filter(if_all(c(-icao), is.na)) |>
+    pull(icao)
+
   acts_doc8643 |>
     left_join(all_pax) |>
     mutate(pax = crew + seats_max) |>
