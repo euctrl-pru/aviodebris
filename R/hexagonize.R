@@ -6,18 +6,28 @@
 #'            parquet file in `data/trajectories_<YYYY-MM-DD>_resampled_30s.parquet`
 #' @param resolution the H3 resolution
 #' @param interval resampling interval
+#' @param bbox a bounding box with names `xmin`, `xmax`, `ymin` and `ymax`
 #'
 #' @export
 #'
 #' @returns a new parquet file such as
 #'          `data/trajectories_<YYYY-MM-DD>_resampled_30s_bbox_res_<resolution>.parquet`
 #'
-hexagonize_traffic <- function(day, resolution = 3L, interval = 30L) {
+hexagonize_traffic <- function(
+  day,
+  resolution = 3L,
+  interval = 30L,
+  bbox = c(xmin = -40.01297, ymin = 16.99059, xmax = 46.76206, ymax = 82.00901)
+) {
   date <- day |> lubridate::as_date()
   year <- lubridate::year(date)
   month <- lubridate::month(date)
   day <- lubridate::day(date)
   date <- date |> format("%Y-%m-%d")
+  xmin = bbox["xmin"] |> unname()
+  xmax = bbox["xmax"] |> unname()
+  ymin = bbox["ymin"] |> unname()
+  ymax = bbox["ymax"] |> unname()
 
   withr::local_envvar(c(TZ = "UTC", ORA_SDTZ = "UTC"))
   # con <- |>  withr::local_db_connection(DBI::dbConnect(duckdb(), path = ":memory:"))
@@ -54,8 +64,8 @@ hexagonize_traffic <- function(day, resolution = 3L, interval = 30L) {
         -- xmin = -27.04161, ymin = 25.98853,
         -- xmax =  46.60269, ymax = 72.31645
         (
-          (-27.04161 <= longitude AND longitude < 46.60269)
-            AND (25.98853 <= latitude AND latitude < 72.31645)
+          ({xmin} <= longitude AND longitude < {xmax})
+            AND ({ymin} <= latitude AND latitude < {ymax})
         )
         AND (year = {year} AND month = {month} AND day = {day})
     )
