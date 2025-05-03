@@ -2,13 +2,14 @@
 #'
 #' @param nu the true anomaly, i.e. the angular displacement measured from
 #'           periapsis to the position vector along the direction of motion
-#' @param a  the semi-major axis of the orbit
+#'           [radians]
+#' @param a  the semi-major axis of the orbit [m]
 #' @param e  the eccentricity of the orbit
-#' @param i the inclination of the orbit
-#' @param Omega the Right ascension of the ascending node
-#' @param w the argument of perigee
-#' @param M the mass of the first body (more massive one), i.e. Earth
-#' @param m the mass of the orbiting body (less massive), i.e. satellite.
+#' @param i the inclination of the orbit [radians]
+#' @param Omega the Right ascension of the ascending node [radians]
+#' @param w the argument of perigee [radians]
+#' @param M the mass of the first body (more massive one), i.e. Earth, [kg]
+#' @param m the mass of the orbiting body (less massive), i.e. satellite, [kg].
 #'          In the case of m << M, m can be passed as 0
 #'
 #' @returns a vector with I, J, K, Vi, Vj, Vk of the values of position and
@@ -44,9 +45,9 @@ kepler_to_cartesian <- function(
   m = 0 # mass of the other body, i.e. satellite or debris
 ) {
   G <- 6.67430e-11 # gravitational constant
-  mu <- G * (M + m) #standard gravitational parameter
+  mu <- G * (M + m) # standard gravitational parameter
 
-  p <- a * (1 - e^2) # semi-parameter (semi-latus rectum)
+  p <- a * (1 - e * e) # semi-parameter (semi-latus rectum)
   r_0 = p / (1 + e * cos(nu))
 
   #--------------- Coordinates in the perifocal reference system Oxyz -----------------
@@ -99,9 +100,8 @@ kepler_to_cartesian <- function(
 #' }
 latitude_weights <- function(delta_lat, altitude, inclination_deg, n = 10001L) {
   twopi <- 2 * pi
-  n <- n + dplyr::if_else((n %% 2) == 0, 1, 0)
   inclination_rad <- inclination_deg * twopi / 360.0
-  nus <- seq(0, twopi, length.out = n) |>
+  nus <- seq(0, twopi, length.out = n + 1) |>
     utils::head(-1) |>
     tibble::as_tibble_col(column_name = "nu") |>
     dplyr::mutate(inclination = inclination_rad)
