@@ -182,6 +182,29 @@ if (FALSE) {
     write_csv("data/doc8643_acts.csv")
 }
 
+
+read_aircraft_type_file <- function(fn) {
+  # fmt: skip
+  cols <- cols(
+    icao              = col_character(),
+    name              = col_character(),
+    manufacturer      = col_character(),
+    type              = col_character(),
+    wtc               = col_character(),
+    recat_eu          = col_character(),
+    mtow_kg           = col_double(),
+    cruise_tas_kt     = col_double(),
+    cruise_mach       = col_double(),
+    cruise_range_nm   = col_double(),
+    cruise_ceiling_fl = col_double(),
+    wing_span_m       = col_double(),
+    length_m          = col_double(),
+    height_m          = col_double(),
+    pax               = col_double()
+  )
+  read_csv(fn, col_types = cols)
+}
+
 #---- unite scraped data ----
 aircraft_types <- here::here(
   "data-raw",
@@ -192,30 +215,10 @@ aircraft_types <- here::here(
     "doc8643_acts.csv"
   )
 ) |>
-  purrr::map(.f = function(fn) {
-    # fmt: skip
-    cols <- cols(
-      icao              = col_character(),
-      name              = col_character(),
-      manufacturer      = col_character(),
-      type              = col_character(),
-      wtc               = col_character(),
-      recat_eu          = col_character(),
-      mtow_kg           = col_double(),
-      cruise_tas_kt     = col_double(),
-      cruise_mach       = col_double(),
-      cruise_range_nm   = col_double(),
-      cruise_ceiling_fl = col_double(),
-      wing_span_m       = col_double(),
-      length_m          = col_double(),
-      height_m          = col_double(),
-      pax               = col_double()
-    )
-    read_csv(fn, col_types = cols)
-  }) |>
+  purrr::map(.f = read_aircraft_type_file) |>
   bind_rows() |>
   rows_patch(missing_cruise_speed) |>
-  filter(is.na(cruise_tas_kt))
+  filter(!is.na(cruise_tas_kt))
 
 aircraft_types |>
   usethis::use_data(overwrite = TRUE)
