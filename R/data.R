@@ -77,9 +77,19 @@
 #' @format ## `aircraft_types`
 #' A data frame with 322 rows and 15 columns:
 #' * `icao`: the ICAO aircraft type code.
-#' * `name`: the the aircraft type name.
+#' * `name`: the aircraft type name.
 #' * `manufacturer`: the manufacturer.
 #' * `type`: the type, i.e. L2J for **L**andplane **2** **J**et engines craft
 #' * `wtc`: Wake Turbulence Category
 #' * `...`: the rest
 "aircraft_types"
+
+
+#' Effective Exposed Area
+#'
+#' @format ## `effective_expose_area`
+#' A data frame with columns:
+#' * `icao`: the ICAO aircraft type code.
+#' * `eea`: the effective exposed area.
+#' * `pax`: the max number of passengers.
+"effective_expose_area"
