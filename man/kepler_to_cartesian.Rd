@@ -8,21 +8,22 @@ kepler_to_cartesian(nu, a, e, i, Omega, w, M = 5.9722e+24, m = 0)
 }
 \arguments{
 \item{nu}{the true anomaly, i.e. the angular displacement measured from
-periapsis to the position vector along the direction of motion}
+periapsis to the position vector along the direction of motion
+[radians]}
 
-\item{a}{the semi-major axis of the orbit}
+\item{a}{the semi-major axis of the orbit [m]}
 
 \item{e}{the eccentricity of the orbit}
 
-\item{i}{the inclination of the orbit}
+\item{i}{the inclination of the orbit [radians]}
 
-\item{Omega}{the Right ascension of the ascending node}
+\item{Omega}{the Right ascension of the ascending node [radians]}
 
-\item{w}{the argument of perigee}
+\item{w}{the argument of perigee [radians]}
 
-\item{M}{the mass of the first body (more massive one), i.e. Earth}
+\item{M}{the mass of the first body (more massive one), i.e. Earth, [kg]}
 
-\item{m}{the mass of the orbiting body (less massive), i.e. satellite.
+\item{m}{the mass of the orbiting body (less massive), i.e. satellite, [kg].
 In the case of m << M, m can be passed as 0}
 }
 \value{
