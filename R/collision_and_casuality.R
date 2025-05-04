@@ -12,16 +12,6 @@ collision_and_casuality_risk_expectation_hourly <- function(
 ) {
   date <- day |> lubridate::as_date()
 
-  effective_expose_area <- aviodebris::aircraft_types |>
-    dplyr::mutate(
-      eea = ((.data$cruise_tas_kt * .data$wing_span_m * .data$height_m) +
-        (145 * .data$wing_span_m * .data$length_m)) /
-        145,
-      eea = dplyr::if_else(is.na(.data$eea), 1000, .data$eea),
-      NULL
-    ) |>
-    dplyr::select("icao", "eea", "pax")
-
   arrow::read_parquet(
     here::here(
       "data",
@@ -35,7 +25,10 @@ collision_and_casuality_risk_expectation_hourly <- function(
       aviodebris::weightings_h3_resolution_3_hourly,
       by = c("cell" = stringr::str_glue("h3_resolution_{resolution}"))
     ) |>
-    dplyr::left_join(effective_expose_area, by = c("aircraft_type" = "icao")) |>
+    dplyr::left_join(
+      aviodebris::effective_expose_area,
+      by = c("aircraft_type" = "icao")
+    ) |>
     dplyr::mutate(
       eea = dplyr::if_else(is.na(.data$eea), 1000, .data$eea),
       pax = dplyr::if_else(is.na(.data$pax), 10, .data$pax)
