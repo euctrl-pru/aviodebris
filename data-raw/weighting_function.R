@@ -70,7 +70,7 @@ weightings_half_degree_hourly <- weightings_half_degree_latitude |>
   mutate(
     # spread by longitude
     val = val / length(lons),
-    # spead by hour
+    # spread by hour
     val = val / hs,
     NULL
   ) |>
