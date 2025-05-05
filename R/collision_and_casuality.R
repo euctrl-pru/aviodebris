@@ -34,7 +34,7 @@ collision_and_casuality_risk_expectation_hourly <- function(
       .data$cell,
       .data$aircraft_type
     ) |>
-    dplyr::sumarise(
+    dplyr::summarise(
       # take the mean of the half degree values
       w = mean(.data$w),
       # just take the mean, but values should all be the same
@@ -71,7 +71,9 @@ collision_and_casuality_risk_expectation_hourly <- function(
       .data$hour,
       .data$cell
     ) |>
-    dplyr::summarise(collision_expectation = sum(collision_expectation)) |>
+    dplyr::summarise(
+      collision_expectation = sum(.data$collision_expectation)
+    ) |>
     dplyr::ungroup() |>
     arrow::write_parquet(
       here::here(
