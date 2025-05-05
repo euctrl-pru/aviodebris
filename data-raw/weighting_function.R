@@ -83,7 +83,7 @@ weightings_h3_resolution_3_hourly <- weightings_half_degree_hourly |>
   st_as_sf(coords = c("lon", "lat"), crs = 4326) |>
   point_to_cell(res = 3, simple = FALSE) |>
   # integrate (sum) over the ones in each cell and divide by the cell area
-  reframe(
+  summarise(
     w = mean(val),
     .by = h3_resolution_3
   ) |>

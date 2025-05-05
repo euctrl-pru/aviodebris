@@ -1,12 +1,12 @@
-#' Calculate hourly collision and casuality risk expectation
+#' Calculate hourly collision and casualty risk expectation
 #'
 #' @param day date to calculate for
 #' @param resolution H3 hex resolution
 #'
-#' @returns save the result in a parquet file `collision_and_casuality_hourly.parquet`
+#' @returns save the result in a parquet file `collision_and_casualty_hourly.parquet`
 #' @export
 #'
-collision_and_casuality_risk_expectation_hourly <- function(
+collision_and_casualty_risk_expectation_hourly <- function(
   day,
   resolution = 3L
 ) {

@@ -2,7 +2,7 @@
 
 export(bbox_nm)
 export(bbox_of_hexes_for_bbox_at_res)
-export(collision_and_casuality_risk_expectation_hourly)
+export(collision_and_casualty_risk_expectation_hourly)
 export(hexagonize_traffic)
 export(hexes_for_bbox_at_res)
 export(kepler_to_cartesian)

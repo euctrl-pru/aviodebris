@@ -72,6 +72,7 @@
 #'
 "weightings_h3_resolution_3_hourly"
 
+
 #' Aircraft type info
 #'
 #' @format ## `aircraft_types`
