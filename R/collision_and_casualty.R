@@ -39,7 +39,8 @@ collision_and_casualty_risk_expectation_hourly <- function(
       w = mean(.data$w),
       # just take the mean, but values should all be the same
       # this is done to keep the column
-      occupancy = mean(.data$occupancy)
+      occupancy = mean(.data$occupancy),
+      density_m2 = mean(.data$density_m2)
     ) |>
     dplyr::ungroup() |>
     dplyr::left_join(
@@ -47,8 +48,8 @@ collision_and_casualty_risk_expectation_hourly <- function(
       by = c("aircraft_type" = "icao")
     ) |>
     dplyr::mutate(
-      eea = dplyr::if_else(is.na(.data$eea), 1000, .data$eea),
-      pax = dplyr::if_else(is.na(.data$pax), 10, .data$pax)
+      eea = dplyr::if_else(is.na(.data$eea), 500, .data$eea),
+      pax = dplyr::if_else(is.na(.data$pax), 7, .data$pax)
     ) |>
     # per cell per hour per aircraft type
     dplyr::group_by(
@@ -60,7 +61,7 @@ collision_and_casualty_risk_expectation_hourly <- function(
       .data$aircraft_type
     ) |>
     dplyr::summarize(
-      collision_expectation = .data$w * .data$occupancy * .data$eea
+      collision_expectation = .data$w * .data$density_m2 * .data$eea
     ) |>
     dplyr::ungroup() |>
     # per cell hourly
