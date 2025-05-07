@@ -162,6 +162,8 @@ rot3 <- function(vec, theta) {
 
   c(outvec_1, outvec_2, outvec_3)
 
+  # rotation about a generic axis
+  # https://en.wikipedia.org/wiki/Rotation_matrix#Rotation_matrix_from_axis_and_angle
   # matrix(
   #   # fmt: skip
   #   c( cos(theta),  sin(theta), 0,
@@ -173,5 +175,97 @@ rot3 <- function(vec, theta) {
   #   as.vector()
 }
 
-# rotation about a generic axis
-# https://en.wikipedia.org/wiki/Rotation_matrix#Rotation_matrix_from_axis_and_angle
+
+knorm <- function(x, k) {
+  max(abs(x)) * (sum((abs(x) / max(abs(x)))^k))^(1 / k)
+}
+
+mag <- function(x) {
+  knorm(x, 2)
+}
+
+#' convert a geocentric equatorial position vector into latitude and longitude
+#'
+#' This function finds both geodetic and geocentric latitude.
+#'
+#' @param r ECEF (I, J, K) position vector [km]
+#'
+#' @returns a list of the following named values
+#'          * `latgc`: geocentric latitude of satellite, \eqn{[-\pi/2, \pi/2]} [rad]
+#'          * `latgd`: geodetic latitude of satellite, \eqn{[-\pi/2, \pi/2]} [rad]
+#'          * `lon`: longitude of satellite, \eqn{[-\pi, \pi]} [rad]
+#'          * `hellp`: height above the ellipsoid, [km]
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' r <- c(
+#'   i = 6524.834,
+#'   j = 6862.875,
+#'   k = 6448.296
+#' ) |>
+#'   units::set_units("km")
+#'
+#' res <- ecef2ll(r)
+#' }
+ecef2ll <- function(r) {
+  pi <- pi |> units::set_units("rad")
+  small <- 0.00000001 # small value for tolerances
+  re <- 6378.1363 |> units::set_units("km")
+  eesqrd <- 0.006694385000 |> units::set_units() # eccentricity of earth sqrd
+
+  magr <- mag(r)
+
+  # find the longitude value
+  names(r) <- NULL
+  temp <- sqrt(r[1] * r[1] + r[2] * r[2])
+  if (abs(temp) < units::set_units(small, "km")) {
+    rtasc <- sign(r[3]) * pi * 0.5
+  } else {
+    rtasc = atan2(r[2], r[1]) |>
+      units::set_units(NULL) |>
+      units::set_units("rad")
+  }
+
+  lon <- rtasc
+
+  if (abs(lon) >= pi) {
+    if (lon < 0.0) {
+      lon <- 2 * pi + lon
+    } else {
+      lon <- lon - 2 * pi
+    }
+  }
+
+  decl <- asin(r[3] / magr)
+  latgd <- decl
+
+  # iterate to find geodetic latitude
+  i <- 1
+  olddelta <- latgd + units::set_units(10.0, "rad")
+
+  while (
+    (abs(olddelta - latgd) >= units::set_units(small, "rad")) && (i < 10)
+  ) {
+    olddelta = latgd
+    sintemp <- sin(latgd)
+    c <- re / (sqrt(units::set_units(1.0) - eesqrd * sintemp * sintemp))
+    latgd <- atan((r[3] + c * eesqrd * sintemp) / temp)
+    i <- i + 1
+  }
+
+  # calculate the height
+  # if less of 1 degree
+  if ((pi * 0.5 - abs(latgd)) < pi / 180.0) {
+    hellp <- (temp / cos(latgd)) - c
+  } else {
+    s <- c * (units::set_units(1.0) - eesqrd)
+    hellp <- r[3] / sin(latgd) - s
+  }
+
+  latgc <- asin(r[3] / magr)
+
+  return(
+    list(latgc = latgc, latgd = latgd, lon = lon, hellp = hellp)
+  )
+}
