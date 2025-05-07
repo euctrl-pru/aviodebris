@@ -2,6 +2,7 @@
 
 export(bbox_nm)
 export(bbox_of_hexes_for_bbox_at_res)
+export(coe2rv)
 export(collision_and_casualty_risk_expectation_hourly)
 export(hexagonize_traffic)
 export(hexes_for_bbox_at_res)

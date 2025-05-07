@@ -40,6 +40,10 @@ Imports:
     tibble,
     tidyr,
     trrrj,
+    units,
     withr
 Depends: 
     R (>= 3.5)
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
