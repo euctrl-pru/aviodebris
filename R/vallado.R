@@ -269,3 +269,11 @@ ecef2ll <- function(r) {
     list(latgc = latgc, latgd = latgd, lon = lon, hellp = hellp)
   )
 }
+
+
+interval_modulus <- function(x, a, b) {
+  if (a == b) {
+    return(x)
+  }
+  a + ((x - a) %% (b - a))
+}
