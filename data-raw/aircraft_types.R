@@ -221,4 +221,5 @@ aircraft_types <- here::here(
   filter(!is.na(cruise_tas_kt))
 
 aircraft_types |>
+  readr::write_csv("data-raw/aircraft_types.csv") |>
   usethis::use_data(overwrite = TRUE)
