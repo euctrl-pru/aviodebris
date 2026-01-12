@@ -25,15 +25,6 @@ collision_and_casualty_risk_expectation_hourly <- function(
       aviodebris::weightings_h3_resolution_3_hourly,
       by = c("cell" = stringr::str_glue("h3_resolution_{resolution}"))
     ) |>
-    # per cell per hour per aircraft type
-    dplyr::group_by(
-      .data$year,
-      .data$month,
-      .data$day,
-      .data$hour,
-      .data$cell,
-      .data$aircraft_type
-    ) |>
     dplyr::summarise(
       # take the mean of the half degree values
       w = mean(.data$w),
@@ -41,7 +32,7 @@ collision_and_casualty_risk_expectation_hourly <- function(
       # this is done to keep the column
       occupancy = mean(.data$occupancy),
       density_m2 = mean(.data$density_m2),
-      .groups = "drop"
+      .by = c("year", "month", "day", "hour", "cell", "aircraft_type")
     ) |>
     dplyr::left_join(
       aviodebris::effective_exposed_area,
@@ -51,30 +42,13 @@ collision_and_casualty_risk_expectation_hourly <- function(
       eea = dplyr::if_else(is.na(.data$eea), 500, .data$eea),
       pax = dplyr::if_else(is.na(.data$pax), 7, .data$pax)
     ) |>
-    # per cell per hour per aircraft type
-    dplyr::group_by(
-      .data$year,
-      .data$month,
-      .data$day,
-      .data$hour,
-      .data$cell,
-      .data$aircraft_type
-    ) |>
-    dplyr::summarize(
+    dplyr::summarise(
       collision_expectation = .data$w * .data$density_m2 * .data$eea,
-      .groups = "drop"
-    ) |>
-    # per cell hourly
-    dplyr::group_by(
-      .data$year,
-      .data$month,
-      .data$day,
-      .data$hour,
-      .data$cell
+      .by = c("year", "month", "day", "hour", "cell", "aircraft_type")
     ) |>
     dplyr::summarise(
       collision_expectation = sum(.data$collision_expectation),
-      .groups = "drop"
+      .by = c("year", "month", "day", "hour", "cell")
     ) |>
     arrow::write_parquet(
       here::here(
