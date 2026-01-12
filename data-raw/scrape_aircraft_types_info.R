@@ -39,7 +39,7 @@ if (FALSE) {
     extract_aircraft_types("aircraft_type")
 
   # ---- EUROCONTROL Perfromance DB ----
-  host <- "https://contentzone.eurocontrol.int/"
+  host <- "https://learningzone.eurocontrol.int/ilp/customs/ATCPFDB/details.aspx"
   session <- polite::bow(host, force = TRUE)
   scraper <- purrr::partial(scrape_aircraft_type_info_perfdb, session = session)
 
