@@ -1,0 +1,39 @@
+# Package index
+
+## All functions
+
+- [`aircraft_types`](aircraft_types.md) : Aircraft type info
+- [`bbox_nm()`](bbox_nm.md) : Approximate bounding box for NM area
+- [`bbox_of_hexes_for_bbox_at_res()`](bbox_of_hexes_for_bbox_at_res.md)
+  : Return the bounding box of the H3 hexagons covering a user bounding
+  box.
+- [`collision_and_casualty_risk_expectation_hourly()`](collision_and_casualty_risk_expectation_hourly.md)
+  : Calculate hourly collision and casualty risk expectation
+- [`effective_exposed_area`](effective_exposed_area.md) : Effective
+  Exposed Area
+- [`hexagonize_traffic()`](hexagonize_traffic.md) : assign H3 cell index
+  at specified resolution to all trajectory point
+- [`hexes_for_bbox_at_res()`](hexes_for_bbox_at_res.md) : H3 hexagons
+  covering a bounding box.
+- [`kepler_to_cartesian()`](kepler_to_cartesian.md) : convert from
+  orbital elements to Cartesian coordinates
+- [`latitude_weights()`](latitude_weights.md) : latitude weight for a
+  space object circularly orbiting at \`inclination\`
+- [`plot_hexes_map()`](plot_hexes_map.md) : Plot H3 hex map
+- [`reentries_gcat`](reentries_gcat.md) : Debris reentry data
+- [`resample_traffic()`](resample_traffic.md) : reasample a day of
+  trajectories at 30s
+- [`scrape_aircraft_type_info_doc8643()`](scrape_aircraft_type_info_doc8643.md)
+  : Scraper for \`doc8643.com\`'s Aircraft info
+- [`scrape_aircraft_type_info_perfdb()`](scrape_aircraft_type_info_perfdb.md)
+  : Scraper for EUROCONTROL's Aircraft Performance DB
+- [`scrape_aircraft_type_info_skybrary()`](scrape_aircraft_type_info_skybrary.md)
+  : Scraper for EUROCONTROL's Skybrary aircraft info
+- [`traffic_density_hourly()`](traffic_density_hourly.md) : Calculated
+  the hourly traffic density per aircraft type
+- [`weightings_h3_resolution_3_hourly`](weightings_h3_resolution_3_hourly.md)
+  : Debris hourly density function per H3 hex cell at resolution 3
+- [`weightings_half_degree_hourly`](weightings_half_degree_hourly.md) :
+  Debris weighting function for half degree grid
+- [`weightings_half_degree_latitude`](weightings_half_degree_latitude.md)
+  : Debris weighting function per latitude

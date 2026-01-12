@@ -1,0 +1,67 @@
+# Scraper for \`doc8643.com\`'s Aircraft info
+
+Scraper for \`doc8643.com\`'s Aircraft info
+
+## Usage
+
+``` r
+scrape_aircraft_type_info_doc8643(ac_type, session)
+```
+
+## Arguments
+
+- ac_type:
+
+  ICAO aircraft type
+
+- session:
+
+  \`polite\` session
+
+## Value
+
+a dataframe of aircraft info
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+host <- "https://doc8643.com/"
+session <- polite::bow(host, force = TRUE)
+scraper <- purrr::partial(scrape_aircraft_type_info_doc8643, session = session)
+
+ac_types |>
+  map(.f = scraper) |>
+  bind_rows() |>
+  # fix some data
+  mutate(
+    type = case_when(
+      icao == "C700" ~ "L2J",
+      icao == "C68A" ~ "L2J",
+      .default = .data$type
+    )
+  ) |>
+  separate_wider_delim(
+    manufacturer,
+    " ",
+    names = c("manufacturer", "other"),
+    too_many = "drop"
+  ) |>
+  # fix some data
+  mutate(
+    manufacturer = case_when(
+      manufacturer == "AIR" ~ str_c(manufacturer, other, sep = " "),
+      manufacturer == "AVIONES" ~ str_c(manufacturer, other, sep = " "),
+      manufacturer == "GULFSTREAM" ~ str_c(manufacturer, other, sep = " "),
+      other == "HELICOPTERS" & manufacturer == "AIRBUS" ~
+        str_c(manufacturer, other, sep = " "),
+      other == "GRUMMAN" & manufacturer == "NORTHROP" ~
+        str_c(manufacturer, other, sep = " "),
+      other == "MARTIN" & manufacturer == "LOCKHEED" ~
+        str_c(manufacturer, other, sep = " "),
+      .default = manufacturer
+    )
+  ) |>
+  select(-other)
+} # }
+```
