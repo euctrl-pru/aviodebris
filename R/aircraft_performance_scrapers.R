@@ -17,7 +17,11 @@
 #'   map(.f = scraper) |>
 #'   bind_rows()
 #' }
-scrape_aircraft_type_info_perfdb <- function(ac_type, session) {
+scrape_aircraft_type_info_perfdb <- function(
+  ac_type,
+  session,
+  polite_scrape = TRUE
+) {
   make_valid <- function(value) {
     value <- ifelse(
       length(value) == 0,
@@ -187,7 +191,7 @@ scrape_aircraft_type_info_perfdb <- function(ac_type, session) {
 scrape_aircraft_type_info_skybrary <- function(
   ac_type,
   session,
-  polite_scrape = FALSE
+  polite_scrape = TRUE
 ) {
   make_valid <- function(value) {
     value <- ifelse(
@@ -212,7 +216,12 @@ scrape_aircraft_type_info_skybrary <- function(
       ac_type = tolower(ac_type)
     )
   )
-  page <- full_url |> polite::scrape()
+
+  if (polite_scrape == TRUE) {
+    page <- full_url |> polite::scrape()
+  } else {
+    page <- rvest::read_html(full_url$url)
+  }
 
   if (is.null(page)) {
     # fmt: skip
@@ -392,7 +401,11 @@ scrape_aircraft_type_info_skybrary <- function(
 #'   ) |>
 #'   select(-other)
 #' }
-scrape_aircraft_type_info_doc8643 <- function(ac_type, session) {
+scrape_aircraft_type_info_doc8643 <- function(
+  ac_type,
+  session,
+  polite_scrape = TRUE
+) {
   make_valid <- function(value) {
     value <- ifelse(
       length(value) == 0,
@@ -416,7 +429,12 @@ scrape_aircraft_type_info_doc8643 <- function(ac_type, session) {
       ac_type = toupper(ac_type)
     )
   )
-  page <- full_url |> polite::scrape()
+
+  if (polite_scrape == TRUE) {
+    page <- full_url |> polite::scrape()
+  } else {
+    page <- rvest::read_html(full_url$url)
+  }
 
   if (is.null(page)) {
     # fmt: skip
