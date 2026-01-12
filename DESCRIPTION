@@ -30,10 +30,8 @@ Imports:
     here,
     lubridate,
     magrittr,
-    polite,
     purrr,
     rlang,
-    rvest,
     sf,
     smoothr,
     stringr,
@@ -43,3 +41,7 @@ Imports:
     withr
 Depends: 
     R (>= 3.5)
+URL: https://euctrl-pru.github.io/aviodebris/
+Suggests: 
+    polite,
+    rvest

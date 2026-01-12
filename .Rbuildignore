@@ -4,3 +4,6 @@
 ^data-raw$
 ^CLAUDE\.md$
 ^\.github$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
