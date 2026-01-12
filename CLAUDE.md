@@ -115,9 +115,9 @@ Key dependencies:
 - ~~`hexagonize.R`: Parameter `day` is shadowed by `lubridate::day(date)` assignment~~ ✓ Fixed (renamed to `day_of_month`)
 
 ### Style Improvements
-- Replace `group_by() |> summarise() |> ungroup()` with `.by` argument
-- ~~Add missing `.groups = "drop"` to `summarise()` calls~~ ✓ Fixed in `collision_and_casualty.R`
-- ~~Fix dataset name inconsistency: `effective_expose_area` → `effective_exposed_area`~~ ✓ Fixed
+- ~~Replace `group_by() |> summarise() |> ungroup()` with `.by` argument~~ ✓ Finished
+- ~~Add missing `.groups = "drop"` to `summarise()` calls~~ ✓ Finished
+- ~~Fix dataset name inconsistency: `effective_expose_area` → `effective_exposed_area`~~ ✓ Finished
 
 ### Design Improvements
 - Functions write side-effects only; consider returning data invisibly
