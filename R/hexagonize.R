@@ -22,20 +22,23 @@ hexagonize_traffic <- function(
   date <- day |> lubridate::as_date()
   year <- lubridate::year(date)
   month <- lubridate::month(date)
-  day <- lubridate::day(date)
+  day_of_month <- lubridate::day(date)
   date <- date |> format("%Y-%m-%d")
-  xmin = bbox["xmin"] |> unname()
-  xmax = bbox["xmax"] |> unname()
-  ymin = bbox["ymin"] |> unname()
-  ymax = bbox["ymax"] |> unname()
+  xmin <- bbox["xmin"] |> unname()
+  xmax <- bbox["xmax"] |> unname()
+  ymin <- bbox["ymin"] |> unname()
+  ymax <- bbox["ymax"] |> unname()
 
   withr::local_envvar(c(TZ = "UTC", ORA_SDTZ = "UTC"))
-  # con <- |>  withr::local_db_connection(DBI::dbConnect(duckdb(), path = ":memory:"))
-  con <- DBI::dbConnect(duckdb::duckdb(), path = ":memory:")
+  con <- withr::local_db_connection(DBI::dbConnect(
+    duckdb::duckdb(),
+    path = ":memory:"
+  ))
 
+  ext_dir <- Sys.getenv("DUCKDB_EXTENSION_DIR", "~/.duckdb/extensions")
   DBI::dbExecute(
     con,
-    "SET extension_directory = '/Users/spi/.duckdb/extensions';"
+    stringr::str_glue("SET extension_directory = '{ext_dir}';")
   )
   DBI::dbExecute(con, "LOAD H3;")
   # fmt: skip
@@ -67,7 +70,7 @@ hexagonize_traffic <- function(
           ({xmin} <= longitude AND longitude < {xmax})
             AND ({ymin} <= latitude AND latitude < {ymax})
         )
-        AND (year = {year} AND month = {month} AND day = {day})
+        AND (year = {year} AND month = {month} AND day = {day_of_month})
     )
     TO
       'data/trajectories_{date}_resampled_{interval}s_bbox_res_{resolution}.parquet'

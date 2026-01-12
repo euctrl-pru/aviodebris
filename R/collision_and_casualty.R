@@ -40,11 +40,11 @@ collision_and_casualty_risk_expectation_hourly <- function(
       # just take the mean, but values should all be the same
       # this is done to keep the column
       occupancy = mean(.data$occupancy),
-      density_m2 = mean(.data$density_m2)
+      density_m2 = mean(.data$density_m2),
+      .groups = "drop"
     ) |>
-    dplyr::ungroup() |>
     dplyr::left_join(
-      aviodebris::effective_expose_area,
+      aviodebris::effective_exposed_area,
       by = c("aircraft_type" = "icao")
     ) |>
     dplyr::mutate(
@@ -61,9 +61,9 @@ collision_and_casualty_risk_expectation_hourly <- function(
       .data$aircraft_type
     ) |>
     dplyr::summarize(
-      collision_expectation = .data$w * .data$density_m2 * .data$eea
+      collision_expectation = .data$w * .data$density_m2 * .data$eea,
+      .groups = "drop"
     ) |>
-    dplyr::ungroup() |>
     # per cell hourly
     dplyr::group_by(
       .data$year,
@@ -73,14 +73,14 @@ collision_and_casualty_risk_expectation_hourly <- function(
       .data$cell
     ) |>
     dplyr::summarise(
-      collision_expectation = sum(.data$collision_expectation)
+      collision_expectation = sum(.data$collision_expectation),
+      .groups = "drop"
     ) |>
-    dplyr::ungroup() |>
     arrow::write_parquet(
       here::here(
         "data",
         stringr::str_glue(
-          "collision_and_casuality_{date}_res_{resolution}_hourly.parquet"
+          "collision_and_casualty_{date}_res_{resolution}_hourly.parquet"
         )
       ),
       compression = "gzip"

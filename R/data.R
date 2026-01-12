@@ -88,9 +88,9 @@
 
 #' Effective Exposed Area
 #'
-#' @format ## `effective_expose_area`
+#' @format ## `effective_exposed_area`
 #' A data frame with columns:
 #' * `icao`: the ICAO aircraft type code.
 #' * `eea`: the effective exposed area.
 #' * `pax`: the max number of passengers.
-"effective_expose_area"
+"effective_exposed_area"
