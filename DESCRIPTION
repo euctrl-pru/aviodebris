@@ -40,8 +40,10 @@ Imports:
     trrrj,
     withr
 Depends: 
-    R (>= 3.5)
+    R (>= 4.1)
 URL: https://euctrl-pru.github.io/aviodebris/
 Suggests: 
     polite,
     rvest
+Remotes:
+    github::euctrl-pru/trrrj

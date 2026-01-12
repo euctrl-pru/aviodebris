@@ -8,6 +8,13 @@
 \description{
 Functions to help prepare the data and plots for the DASC 2025 paper "Preparing for Potential Closure of European Airspaces due to Re-entering Space Objects".
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://euctrl-pru.github.io/aviodebris/}
+}
+
+}
 \author{
 \strong{Maintainer}: Enrico Spinielli \email{enrico.spinielli@eurocontrol.int} (\href{https://orcid.org/0000-0001-8584-9131}{ORCID})
 
