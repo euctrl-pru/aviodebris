@@ -8,7 +8,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' host <- "https://contentzone.eurocontrol.int/"
+#' host <- "https://learningzone.eurocontrol.int/ilp/customs/ATCPFDB/details.aspx"
 #' session <- polite::bow(host, force = TRUE)
 #' scraper <- purrr::partial(scrape_aircraft_type_info_perfdb,
 #'                           session = session)
@@ -39,7 +39,7 @@ scrape_aircraft_type_info_perfdb <- function(ac_type, session) {
   full_url <- polite::nod(
     session,
     stringr::str_glue(
-      "aircraftperformance/details.aspx?ICAO={ac_type}",
+      "?ICAO={ac_type}",
       ac_type = toupper(ac_type)
     )
   )
