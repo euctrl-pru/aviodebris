@@ -19,7 +19,7 @@ Scraper for EUROCONTROL's Aircraft Performance DB
 }
 \examples{
 \dontrun{
-host <- "https://contentzone.eurocontrol.int/"
+host <- "https://learningzone.eurocontrol.int/ilp/customs/ATCPFDB/details.aspx"
 session <- polite::bow(host, force = TRUE)
 scraper <- purrr::partial(scrape_aircraft_type_info_perfdb,
                           session = session)
