@@ -17,11 +17,7 @@
 #'   map(.f = scraper) |>
 #'   bind_rows()
 #' }
-scrape_aircraft_type_info_perfdb <- function(
-  ac_type,
-  session,
-  polite_scrape = TRUE
-) {
+scrape_aircraft_type_info_perfdb <- function(ac_type, session) {
   make_valid <- function(value) {
     value <- ifelse(
       length(value) == 0,
@@ -47,11 +43,8 @@ scrape_aircraft_type_info_perfdb <- function(
       ac_type = toupper(ac_type)
     )
   )
-  if (polite_scrape == TRUE) {
-    page <- full_url |> polite::scrape()
-  } else {
-    page <- rvest::read_html(full_url$url)
-  }
+  # page <- full_url |> polite::scrape()
+  page <- full_url$url |> rvest::read_html() # be unpolite and scrape despite robots.txt
 
   icao <- ac_type |> toupper()
   if (
@@ -188,11 +181,7 @@ scrape_aircraft_type_info_perfdb <- function(
 #'   map(.f = scraper) |>
 #'   bind_rows()
 #' }
-scrape_aircraft_type_info_skybrary <- function(
-  ac_type,
-  session,
-  polite_scrape = TRUE
-) {
+scrape_aircraft_type_info_skybrary <- function(ac_type, session) {
   make_valid <- function(value) {
     value <- ifelse(
       length(value) == 0,
@@ -216,12 +205,7 @@ scrape_aircraft_type_info_skybrary <- function(
       ac_type = tolower(ac_type)
     )
   )
-
-  if (polite_scrape == TRUE) {
-    page <- full_url |> polite::scrape()
-  } else {
-    page <- rvest::read_html(full_url$url)
-  }
+  page <- full_url |> polite::scrape()
 
   if (is.null(page)) {
     # fmt: skip
@@ -401,11 +385,7 @@ scrape_aircraft_type_info_skybrary <- function(
 #'   ) |>
 #'   select(-other)
 #' }
-scrape_aircraft_type_info_doc8643 <- function(
-  ac_type,
-  session,
-  polite_scrape = TRUE
-) {
+scrape_aircraft_type_info_doc8643 <- function(ac_type, session) {
   make_valid <- function(value) {
     value <- ifelse(
       length(value) == 0,
@@ -429,12 +409,7 @@ scrape_aircraft_type_info_doc8643 <- function(
       ac_type = toupper(ac_type)
     )
   )
-
-  if (polite_scrape == TRUE) {
-    page <- full_url |> polite::scrape()
-  } else {
-    page <- rvest::read_html(full_url$url)
-  }
+  page <- full_url |> polite::scrape()
 
   if (is.null(page)) {
     # fmt: skip
