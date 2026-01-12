@@ -4,7 +4,6 @@
 #' @param session `polite` session
 #'
 #' @returns a dataframe of aircraft info
-#' @export
 #'
 #' @examples
 #' \dontrun{
@@ -169,7 +168,6 @@ scrape_aircraft_type_info_perfdb <- function(ac_type, session) {
 #' @inheritParams scrape_aircraft_type_info_perfdb
 #'
 #' @returns a dataframe of aircraft info
-#' @export
 #'
 #' @examples
 #' \dontrun{
@@ -343,7 +341,6 @@ scrape_aircraft_type_info_skybrary <- function(ac_type, session) {
 #' @inheritParams scrape_aircraft_type_info_perfdb
 #'
 #' @returns a dataframe of aircraft info
-#' @export
 #'
 #' @examples
 #' \dontrun{
