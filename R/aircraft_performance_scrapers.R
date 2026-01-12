@@ -39,11 +39,15 @@ scrape_aircraft_type_info_perfdb <- function(ac_type, session) {
   full_url <- polite::nod(
     session,
     stringr::str_glue(
-      "?ICAO={ac_type}",
+      "ilp/customs/ATCPFDB/details.aspx?ICAO={ac_type}",
       ac_type = toupper(ac_type)
     )
   )
-  page <- full_url |> polite::scrape()
+  if (polite_scrape == TRUE) {
+    page <- full_url |> polite::scrape()
+  } else {
+    page <- rvest::read_html(full_url$url)
+  }
 
   icao <- ac_type |> toupper()
   if (
@@ -180,7 +184,11 @@ scrape_aircraft_type_info_perfdb <- function(ac_type, session) {
 #'   map(.f = scraper) |>
 #'   bind_rows()
 #' }
-scrape_aircraft_type_info_skybrary <- function(ac_type, session) {
+scrape_aircraft_type_info_skybrary <- function(
+  ac_type,
+  session,
+  polite_scrape = FALSE
+) {
   make_valid <- function(value) {
     value <- ifelse(
       length(value) == 0,
