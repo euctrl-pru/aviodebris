@@ -41,7 +41,10 @@ if (FALSE) {
   # ---- EUROCONTROL Perfromance DB ----
   host <- "https://learningzone.eurocontrol.int/ilp/customs/ATCPFDB/details.aspx"
   session <- polite::bow(host, force = TRUE)
-  scraper <- purrr::partial(scrape_aircraft_type_info_perfdb, session = session)
+  scraper <- purrr::partial(
+    aviodebris:::scrape_aircraft_type_info_perfdb,
+    session = session
+  )
 
   # some aircraft types will be missing, i.e. helicopters
   acts_perfdb <- types_all |>
@@ -79,7 +82,7 @@ if (FALSE) {
   host <- "https://skybrary.aero/"
   session <- polite::bow(host, force = TRUE)
   scraper <- purrr::partial(
-    scrape_aircraft_type_info_skybrary,
+    aviodebris:::scrape_aircraft_type_info_skybrary,
     session = session
   )
 
@@ -119,7 +122,7 @@ if (FALSE) {
   host <- "https://doc8643.com/"
   session <- polite::bow(host, force = TRUE)
   scraper <- purrr::partial(
-    scrape_aircraft_type_info_doc8643,
+    aviodebris:::scrape_aircraft_type_info_doc8643,
     session = session
   )
 
