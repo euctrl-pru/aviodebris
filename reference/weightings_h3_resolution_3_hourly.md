@@ -11,6 +11,5 @@ weightings_h3_resolution_3_hourly
 
 ## Format
 
-\## \`weightings_half_degree_hourly\` A data frame with 360 \* 720 rows
-and 1 column: \* \`h3_resolution_3\`: the H3 cell id \* \`w\`: the value
-of the hourly weighting function.
+A data frame with 360 \* 720 rows and 1 column: \* \`h3_resolution_3\`:
+the H3 cell id \* \`w\`: the value of the hourly weighting function.

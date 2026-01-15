@@ -11,6 +11,6 @@ weightings_half_degree_latitude
 
 ## Format
 
-\## \`weightings_half_degree_latitude\` A data frame with 360 rows
-(latitude from -90 to 90 at half degree) and 2 columns: \* \`lat\`: the
-latitude. \* \`val\`: the value of the weighting function.
+A data frame with 360 rows (latitude from -90 to 90 at half degree) and
+2 columns: \* \`lat\`: the latitude. \* \`val\`: the value of the
+weighting function.
