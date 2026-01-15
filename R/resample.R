@@ -11,7 +11,7 @@
 #'          `data/trajectories_<YYYY-MM-DD>_resampled_<interval>s.parquet`
 #'
 resample_traffic <- function(day, interval = 30L) {
-  date <- day |> lubridate::as_date() |> format(date, "%Y-%m-%d")
+  date <- day |> lubridate::as_date() |> format("%Y-%m-%d")
   fi <- stringr::str_glue("trjs_{date}.parquet")
   fn_in <- here::here("data-raw", "trjs", fi)
 
