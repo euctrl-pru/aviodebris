@@ -26,10 +26,10 @@ traffic_density_hourly <- function(day, resolution = 3L, interval = 30L) {
   here::here("data", fi) |>
     arrow::read_parquet() |>
     dplyr::mutate(
-      year = lubridate::year(.data$timestamp),
-      month = lubridate::month(.data$timestamp),
-      day = lubridate::day(.data$timestamp),
-      hour = lubridate::hour(.data$timestamp)
+      year = lubridate::year(.data$timestamp) |> as.integer(),
+      month = lubridate::month(.data$timestamp) |> as.integer(),
+      day = lubridate::day(.data$timestamp) |> as.integer(),
+      hour = lubridate::hour(.data$timestamp) |> as.integer()
     ) |>
     dplyr::summarise(
       # NOTE: of course 3600 are the seconds in 1 hour
