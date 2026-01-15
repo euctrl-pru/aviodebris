@@ -2,7 +2,7 @@
 % Please edit documentation in R/resample.R
 \name{resample_traffic}
 \alias{resample_traffic}
-\title{reasample a day of trajectories at interval}
+\title{resample a day of trajectories at interval}
 \usage{
 resample_traffic(day, interval = 30L)
 }
@@ -17,5 +17,5 @@ a data frame of resampled points is saved in
          `data/trajectories_<YYYY-MM-DD>_resampled_<interval>s.parquet`
 }
 \description{
-reasample a day of trajectories at interval
+resample a day of trajectories at interval
 }

@@ -14,15 +14,23 @@
 #'          `traffic_density_<YYYY-MM-DD>_hourly.parquet`
 #'
 traffic_density_hourly <- function(day, resolution = 3L, interval = 30L) {
-  date <- day |> lubridate::as_date()
-  here::here(
-    "data",
-    stringr::str_glue(
-      "trajectories_{date}_resampled_{interval}s_bbox_res_{resolution}.parquet",
-      date = format(date, "%Y-%m-%d")
-    )
-  ) |>
+  dd <- day |> lubridate::as_date()
+  date <- dd |> format("%Y-%m-%d")
+  fi <- stringr::str_glue(
+    "trajectories_{date}_resampled_{interval}s_bbox_res_{resolution}.parquet"
+  )
+  fo <- stringr::str_glue(
+    "traffic_density_{date}_res_{resolution}_hourly.parquet"
+  )
+
+  here::here("data", fi) |>
     arrow::read_parquet() |>
+    dplyr::mutate(
+      year = lubridate::year(.data$timestamp),
+      month = lubridate::month(.data$timestamp),
+      day = lubridate::day(.data$timestamp),
+      hour = lubridate::hour(.data$timestamp)
+    ) |>
     dplyr::summarise(
       # NOTE: of course 3600 are the seconds in 1 hour
       # occupancy of the cell is `interval` seconds the number of
@@ -46,14 +54,5 @@ traffic_density_hourly <- function(day, resolution = 3L, interval = 30L) {
     ) |>
     dplyr::select(-.data$cell_area_m2) |>
     dplyr::arrange(.data$occupancy) |>
-    arrow::write_parquet(
-      here::here(
-        "data",
-        stringr::str_glue(
-          "traffic_density_{date}_res_{resolution}_hourly.parquet",
-          date = format(date, "%Y-%m-%d")
-        )
-      ),
-      compression = "gzip"
-    )
+    arrow::write_parquet(here::here("data", fo), compression = "gzip")
 }

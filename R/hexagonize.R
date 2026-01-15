@@ -33,17 +33,19 @@ hexagonize_traffic <- function(
   here::here("data", fn_in) |>
     arrow::read_parquet() |>
     # fmt: skip
+    # filter on bbox
     dplyr::filter(
         xmin <= .data$longitude, .data$longitude <= xmax,
         ymin <= .data$latitude,  .data$latitude  <= ymax,
       ) |>
     dplyr::mutate(
-      hex = h3o::h3_from_xy(
+      cell = h3o::h3_from_xy(
         y = .data$latitude,
         x = .data$longitude,
         resolution = resolution
       ),
-      hex = as.character(.data$hex)
+      cell = as.character(.data$cell),
+      h3_resolution = resolution
     ) |>
     arrow::write_parquet(here::here("data", fn_out))
 }
