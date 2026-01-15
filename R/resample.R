@@ -19,7 +19,6 @@ resample_traffic <- function(day, interval = 30L) {
     stringr::str_glue("trjs_{date}.parquet", date = format(date, "%Y-%m-%d"))
   ) |>
     arrow::read_parquet() |>
-    dplyr::select(-c("callsign", "icao24")) |>
     trrrj::resample(interval) |>
     arrow::write_parquet(here::here(
       "data",
