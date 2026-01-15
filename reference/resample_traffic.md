@@ -1,6 +1,6 @@
-# reasample a day of trajectories at interval
+# resample a day of trajectories at interval
 
-reasample a day of trajectories at interval
+resample a day of trajectories at interval
 
 ## Usage
 

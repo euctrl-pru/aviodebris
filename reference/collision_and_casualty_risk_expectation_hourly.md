@@ -20,5 +20,5 @@ collision_and_casualty_risk_expectation_hourly(day, resolution = 3L)
 
 ## Value
 
-save the result in a parquet file
-\`collision_and_casualty_hourly.parquet\`
+a dataframe with hourly \`collision_expectation\` and \`casualty_risk\`,
+saved in a parquet file \`collision_and_casualty_hourly.parquet\`

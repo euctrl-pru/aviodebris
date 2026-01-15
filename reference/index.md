@@ -21,7 +21,7 @@
   space object circularly orbiting at \`inclination\`
 - [`plot_hexes_map()`](plot_hexes_map.md) : Plot H3 hex map
 - [`reentries_gcat`](reentries_gcat.md) : Debris reentry data
-- [`resample_traffic()`](resample_traffic.md) : reasample a day of
+- [`resample_traffic()`](resample_traffic.md) : resample a day of
   trajectories at interval
 - [`scrape_aircraft_type_info_doc8643()`](scrape_aircraft_type_info_doc8643.md)
   : Scraper for \`doc8643.com\`'s Aircraft info
