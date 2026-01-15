@@ -1,16 +1,15 @@
 #' Debris reentry data
 #'
 #' A subset of data from the following catalogues
-#' * satcat	Standard Satellite Catalog (S) Objects from the US Satellite Catalog
-#' * auxcat	Auxiliary Satellite Catalog	(A) Objects omitted from the US catalog
-#' * tmpcat	Temporary Catalog	(T)	Objects expected to receive an S catalog number soon
+#' * `satcat`	Standard Satellite Catalog (S) Objects from the US Satellite Catalog
+#' * `auxcat`	Auxiliary Satellite Catalog	(A) Objects omitted from the US catalog
+#' * `tmpcat`	Temporary Catalog	(T)	Objects expected to receive an S catalog number soon
 #' consisting of only reentries occurred in the 25 years from
 #' 2000-01-01 (included) till 2025-01-01 (excluded)
 #' `satcat`, `auxcat` and `tmpcat` from
 #' J. C. McDowell, “General Catalog of Artificial Space Objects.” 2020.
 #'
-#' @format ## `reentries_gcat`
-#' A data frame with 1968 rows and 6 columns:
+#' @format A data frame with 1968 rows and 6 columns:
 #' * `jcat`: A space object tag; a single prefix letter followed by a sequence
 #'   number with 5 digits.
 #'   Possible prefixes are:
@@ -36,8 +35,7 @@
 #' weighting functions for reentered debris in 25 years from
 #' 2000-01-01 till 2025-01-01 (excluded), at half degree resolution.
 #'
-#' @format ## `weightings_half_degree_latitude`
-#' A data frame with 360 rows (latitude from -90 to 90 at half degree)
+#' @format A data frame with 360 rows (latitude from -90 to 90 at half degree)
 #' and 2 columns:
 #' * `lat`: the latitude.
 #' * `val`: the value of the weighting function.
@@ -51,8 +49,7 @@
 #' 2000-01-01 till 2025-01-01 (excluded), at half degree resolution
 #' worldwide.
 #'
-#' @format ## `weightings_half_degree_hourly`
-#' A data frame with 360 * 720 rows and 3 columns:
+#' @format A data frame with 360 * 720 rows and 3 columns:
 #' * `lon`: the longitude.
 #' * `lat`: the latitude.
 #' * `val`: the value of the hourly weighting function.
@@ -65,8 +62,7 @@
 #' Hourly weighting functions for reentered debris in 25 years from
 #' 2000-01-01 till 2025-01-01 (excluded), for H3 cells at resolution 3.
 #'
-#' @format ## `weightings_half_degree_hourly`
-#' A data frame with 360 * 720 rows and 1 column:
+#' @format  A data frame with 360 * 720 rows and 1 column:
 #' * `h3_resolution_3`: the H3 cell id
 #' * `w`: the value of the hourly weighting function.
 #'
@@ -75,8 +71,7 @@
 
 #' Aircraft type info
 #'
-#' @format ## `aircraft_types`
-#' A data frame with 322 rows and 15 columns:
+#' @format  A data frame with 322 rows and 15 columns:
 #' * `icao`: the ICAO aircraft type code.
 #' * `name`: the aircraft type name.
 #' * `manufacturer`: the manufacturer.
@@ -88,8 +83,7 @@
 
 #' Effective Exposed Area
 #'
-#' @format ## `effective_exposed_area`
-#' A data frame with columns:
+#' @format A data frame with columns:
 #' * `icao`: the ICAO aircraft type code.
 #' * `eea`: the effective exposed area.
 #' * `pax`: the max number of passengers.

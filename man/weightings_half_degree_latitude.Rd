@@ -5,7 +5,6 @@
 \alias{weightings_half_degree_latitude}
 \title{Debris weighting function per latitude}
 \format{
-## `weightings_half_degree_latitude`
 A data frame with 360 rows (latitude from -90 to 90 at half degree)
 and 2 columns:
 * `lat`: the latitude.

@@ -5,7 +5,6 @@
 \alias{weightings_half_degree_hourly}
 \title{Debris weighting function for half degree grid}
 \format{
-## `weightings_half_degree_hourly`
 A data frame with 360 * 720 rows and 3 columns:
 * `lon`: the longitude.
 * `lat`: the latitude.

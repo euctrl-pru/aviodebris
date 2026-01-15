@@ -5,7 +5,6 @@
 \alias{aircraft_types}
 \title{Aircraft type info}
 \format{
-## `aircraft_types`
 A data frame with 322 rows and 15 columns:
 * `icao`: the ICAO aircraft type code.
 * `name`: the aircraft type name.

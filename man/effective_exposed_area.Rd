@@ -5,7 +5,6 @@
 \alias{effective_exposed_area}
 \title{Effective Exposed Area}
 \format{
-## `effective_exposed_area`
 A data frame with columns:
 * `icao`: the ICAO aircraft type code.
 * `eea`: the effective exposed area.

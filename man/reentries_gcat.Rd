@@ -5,7 +5,6 @@
 \alias{reentries_gcat}
 \title{Debris reentry data}
 \format{
-## `reentries_gcat`
 A data frame with 1968 rows and 6 columns:
 * `jcat`: A space object tag; a single prefix letter followed by a sequence
   number with 5 digits.
@@ -30,9 +29,9 @@ reentries_gcat
 }
 \description{
 A subset of data from the following catalogues
-* satcat	Standard Satellite Catalog (S) Objects from the US Satellite Catalog
-* auxcat	Auxiliary Satellite Catalog	(A) Objects omitted from the US catalog
-* tmpcat	Temporary Catalog	(T)	Objects expected to receive an S catalog number soon
+* `satcat`	Standard Satellite Catalog (S) Objects from the US Satellite Catalog
+* `auxcat`	Auxiliary Satellite Catalog	(A) Objects omitted from the US catalog
+* `tmpcat`	Temporary Catalog	(T)	Objects expected to receive an S catalog number soon
 consisting of only reentries occurred in the 25 years from
 2000-01-01 (included) till 2025-01-01 (excluded)
 `satcat`, `auxcat` and `tmpcat` from
