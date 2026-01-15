@@ -16,7 +16,7 @@ scrape_aircraft_type_info_perfdb(ac_type, session)
 
 - session:
 
-  \`polite\` session
+  `polite` session
 
 ## Value
 

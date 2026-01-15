@@ -16,8 +16,8 @@ bbox_of_hexes_for_bbox_at_res(bbox, resolution)
 
 - resolution:
 
-  the resolution of the H3 hexagons covering \`bbox\`
+  the resolution of the H3 hexagons covering `bbox`
 
 ## Value
 
-the bounding box containing the H3 hexagons covering \`bbox\`
+the bounding box containing the H3 hexagons covering `bbox`

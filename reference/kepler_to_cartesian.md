@@ -34,7 +34,7 @@ kepler_to_cartesian(nu, a, e, i, Omega, w, M = 5.9722e+24, m = 0)
 
 - w:
 
-  the argument of perigee \[radians\]
+  the argument of perigee \\radians\\
 
 - M:
 

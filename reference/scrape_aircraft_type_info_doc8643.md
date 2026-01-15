@@ -1,6 +1,6 @@
-# Scraper for \`doc8643.com\`'s Aircraft info
+# Scraper for `doc8643.com`'s Aircraft info
 
-Scraper for \`doc8643.com\`'s Aircraft info
+Scraper for `doc8643.com`'s Aircraft info
 
 ## Usage
 
@@ -16,7 +16,7 @@ scrape_aircraft_type_info_doc8643(ac_type, session)
 
 - session:
 
-  \`polite\` session
+  `polite` session
 
 ## Value
 

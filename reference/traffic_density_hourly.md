@@ -13,8 +13,8 @@ traffic_density_hourly(day, resolution = 3L, interval = 30L)
 - day:
 
   the date to calculate the traffic density for; it refers to the file
-  \`trajectories\_\<YYYY-MM-DD\>\_resampled\_\<interval\>s_bbox_res\_\<resolution\>.parquet\`
-  in \`data/\`
+  `trajectories_<YYYY-MM-DD>_resampled_<interval>s_bbox_res_<resolution>.parquet`
+  in `data/`
 
 - resolution:
 
@@ -27,4 +27,4 @@ traffic_density_hourly(day, resolution = 3L, interval = 30L)
 ## Value
 
 save the result in a parquet file
-\`traffic_density\_\<YYYY-MM-DD\>\_hourly.parquet\`
+`traffic_density_<YYYY-MM-DD>_hourly.parquet`

@@ -18,8 +18,7 @@ hexagonize_traffic(
 - day:
 
   the date for the trajectories, it refers to the relevant parquet file
-  in
-  \`data/trajectories\_\<YYYY-MM-DD\>\_resampled\_\<interval\>s.parquet\`
+  in `data/trajectories_<YYYY-MM-DD>_resampled_<interval>s.parquet`
 
 - resolution:
 
@@ -31,9 +30,9 @@ hexagonize_traffic(
 
 - bbox:
 
-  a bounding box with names \`xmin\`, \`xmax\`, \`ymin\` and \`ymax\`
+  a bounding box with names `xmin`, `xmax`, `ymin` and `ymax`
 
 ## Value
 
 a new parquet file as
-\`data/trajectories\_\<YYYY-MM-DD\>\_resampled\_\<interval\>s_bbox_res\_\<resolution\>.parquet\`
+`data/trajectories_<YYYY-MM-DD>_resampled_<interval>s_bbox_res_<resolution>.parquet`
