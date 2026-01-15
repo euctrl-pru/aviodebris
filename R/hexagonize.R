@@ -3,15 +3,15 @@
 #' Keep only portions in the BBOX of the study
 #'
 #' @param day the date for the trajectories, it refers to the relevant
-#'            parquet file in `data/trajectories_<YYYY-MM-DD>_resampled_30s.parquet`
+#'            parquet file in `data/trajectories_<YYYY-MM-DD>_resampled_<interval>s.parquet`
 #' @param resolution the H3 resolution
 #' @param interval resampling interval
 #' @param bbox a bounding box with names `xmin`, `xmax`, `ymin` and `ymax`
 #'
 #' @export
 #'
-#' @returns a new parquet file such as
-#'          `data/trajectories_<YYYY-MM-DD>_resampled_30s_bbox_res_<resolution>.parquet`
+#' @returns a new parquet file as
+#'   `data/trajectories_<YYYY-MM-DD>_resampled_<interval>s_bbox_res_<resolution>.parquet`
 #'
 hexagonize_traffic <- function(
   day,
@@ -19,63 +19,31 @@ hexagonize_traffic <- function(
   interval = 30L,
   bbox = c(xmin = -40.01297, ymin = 16.99059, xmax = 46.76206, ymax = 82.00901)
 ) {
-  date <- day |> lubridate::as_date()
-  year <- lubridate::year(date)
-  month <- lubridate::month(date)
-  day_of_month <- lubridate::day(date)
-  date <- date |> format("%Y-%m-%d")
+  date <- day |> lubridate::as_date() |> format("%Y-%m-%d")
   xmin <- bbox["xmin"] |> unname()
   xmax <- bbox["xmax"] |> unname()
   ymin <- bbox["ymin"] |> unname()
   ymax <- bbox["ymax"] |> unname()
 
-  withr::local_envvar(c(TZ = "UTC", ORA_SDTZ = "UTC"))
-  con <- withr::local_db_connection(DBI::dbConnect(
-    duckdb::duckdb(),
-    path = ":memory:"
-  ))
+  fn_in <- "trajectories_{date}_resampled_{interval}s.parquet" |>
+    stringr::str_glue()
+  fn_out <- "trajectories_{date}_resampled_{interval}s_bbox_res_{resolution}.parquet" |>
+    stringr::str_glue()
 
-  ext_dir <- Sys.getenv("DUCKDB_EXTENSION_DIR", "~/.duckdb/extensions")
-  DBI::dbExecute(
-    con,
-    stringr::str_glue("SET extension_directory = '{ext_dir}';")
-  )
-  DBI::dbExecute(con, "LOAD H3;")
-  # fmt: skip
-  query <- stringr::str_glue("
-    CREATE OR REPLACE TABLE TRAJECTORY AS
-    SELECT
-      *,
-      ROW_NUMBER() OVER(PARTITION BY flight_id ORDER BY timestamp) AS seq_id,
-      date_part('day',   timestamp) AS day,
-      date_part('month', timestamp) AS month,
-      date_part('year',  timestamp) AS year,
-      date_part('hour',  timestamp) AS hour,
-      h3_h3_to_string(h3_latlng_to_cell(latitude, longitude, {resolution})) AS cell,
-      {resolution} AS h3_resolution
-    FROM
-        'data/trajectories_{date}_resampled_{interval}s.parquet';
-    ALTER TABLE TRAJECTORY DROP COLUMN sequence_id;
-    ALTER TABLE TRAJECTORY RENAME seq_id TO sequence_id;
-    COPY(
-      SELECT
-        *
-      FROM
-        TRAJECTORY
-      WHERE
-        -- filter on bounding box (all HEX cells at res 3 containing NM area)
-        -- xmin = -27.04161, ymin = 25.98853,
-        -- xmax =  46.60269, ymax = 72.31645
-        (
-          ({xmin} <= longitude AND longitude < {xmax})
-            AND ({ymin} <= latitude AND latitude < {ymax})
-        )
-        AND (year = {year} AND month = {month} AND day = {day_of_month})
-    )
-    TO
-      'data/trajectories_{date}_resampled_{interval}s_bbox_res_{resolution}.parquet'
-    (FORMAT 'parquet')
-    ;")
-
-  DBI::dbExecute(con, query)
+  here::here("data", fn_in) |>
+    arrow::read_parquet() |>
+    # fmt: skip
+    dplyr::filter(
+        xmin <= .data$longitude, .data$longitude <= xmax,
+        ymin <= .data$latitude,  .data$latitude  <= ymax,
+      ) |>
+    dplyr::mutate(
+      hex = h3o::h3_from_xy(
+        y = .data$latitude,
+        x = .data$longitude,
+        resolution = resolution
+      ),
+      hex = as.character(.data$hex)
+    ) |>
+    arrow::write_parquet(here::here("data", fn_out))
 }

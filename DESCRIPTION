@@ -1,7 +1,7 @@
 Package: aviodebris
 Type: Package
 Title: Estimate impact of space debris reentries on aviation
-Version: 0.1.27
+Version: 0.2.0
 Authors@R: 
     c(person(given = "Enrico",
              family = "Spinielli",
@@ -21,12 +21,11 @@ RoxygenNote: 7.3.2
 Imports: 
     arrow,
     cli,
-    DBI,
     dplyr,
-    duckdb,
     ggplot2,
     giscoR,
     h3jsr,
+    h3o,
     here,
     lubridate,
     magrittr,
@@ -37,8 +36,7 @@ Imports:
     stringr,
     tibble,
     tidyr,
-    trrrj,
-    withr
+    trrrj
 Depends: 
     R (>= 4.1)
 URL: https://euctrl-pru.github.io/aviodebris/
