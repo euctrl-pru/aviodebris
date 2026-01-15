@@ -2,20 +2,20 @@
 % Please edit documentation in R/aircraft_performance_scrapers.R
 \name{scrape_aircraft_type_info_doc8643}
 \alias{scrape_aircraft_type_info_doc8643}
-\title{Scraper for `doc8643.com`'s Aircraft info}
+\title{Scraper for \code{doc8643.com}'s Aircraft info}
 \usage{
 scrape_aircraft_type_info_doc8643(ac_type, session)
 }
 \arguments{
 \item{ac_type}{ICAO aircraft type}
 
-\item{session}{`polite` session}
+\item{session}{\code{polite} session}
 }
 \value{
 a dataframe of aircraft info
 }
 \description{
-Scraper for `doc8643.com`'s Aircraft info
+Scraper for \code{doc8643.com}'s Aircraft info
 }
 \examples{
 \dontrun{

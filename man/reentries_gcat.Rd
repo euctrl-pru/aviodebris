@@ -6,35 +6,43 @@
 \title{Debris reentry data}
 \format{
 A data frame with 1968 rows and 6 columns:
-* `jcat`: A space object tag; a single prefix letter followed by a sequence
-  number with 5 digits.
-  Possible prefixes are:
-  - `A` for auxcat (Auxiliary catalog)
-  - `S` for stdcat (Standard catalog)
-  - `T` for tmpcat (Temporary catalog)
-* `piece`: The piece designation for the object
-* `type`: This field tells you something about what kind of object:
-  - `R1`--`R5`: Stage number for launch vehicle stage.
-  - `C..[A|M]`: a component, i.e. a functional part of the spacecraft or
-        rocket that is deliberately or accidentally ejected.
-* `inclination`: the orbit inclination in the [-90, 90] interval.
-* `reentry_date`: the date of reentry in ["vague date" format](https://planet4589.org/space/gcat/web/intro/vague.html).
-* `dry_mass`: the (poosibly estimated) dry mass.
+\itemize{
+\item \code{jcat}: A space object tag; a single prefix letter followed by a sequence
+number with 5 digits.
+Possible prefixes are:
+\itemize{
+\item \code{A} for auxcat (Auxiliary catalog)
+\item \code{S} for stdcat (Standard catalog)
+\item \code{T} for tmpcat (Temporary catalog)
+}
+\item \code{piece}: The piece designation for the object
+\item \code{type}: This field tells you something about what kind of object:
+\itemize{
+\item \code{R1}--\code{R5}: Stage number for launch vehicle stage.
+\item \code{C..[A|M]}: a component, i.e. a functional part of the spacecraft or
+rocket that is deliberately or accidentally ejected.
+}
+\item \code{inclination}: the orbit inclination in the [-90, 90] interval.
+\item \code{reentry_date}: the date of reentry in \href{https://planet4589.org/space/gcat/web/intro/vague.html}{"vague date" format}.
+\item \code{dry_mass}: the (poosibly estimated) dry mass.
+}
 }
 \source{
-<https://planet4589.org/space/gcat>
+\url{https://planet4589.org/space/gcat}
 }
 \usage{
 reentries_gcat
 }
 \description{
 A subset of data from the following catalogues
-* `satcat`	Standard Satellite Catalog (S) Objects from the US Satellite Catalog
-* `auxcat`	Auxiliary Satellite Catalog	(A) Objects omitted from the US catalog
-* `tmpcat`	Temporary Catalog	(T)	Objects expected to receive an S catalog number soon
+\itemize{
+\item \code{satcat}	Standard Satellite Catalog (S) Objects from the US Satellite Catalog
+\item \code{auxcat}	Auxiliary Satellite Catalog	(A) Objects omitted from the US catalog
+\item \code{tmpcat}	Temporary Catalog	(T)	Objects expected to receive an S catalog number soon
 consisting of only reentries occurred in the 25 years from
 2000-01-01 (included) till 2025-01-01 (excluded)
-`satcat`, `auxcat` and `tmpcat` from
+\code{satcat}, \code{auxcat} and \code{tmpcat} from
 J. C. McDowell, “General Catalog of Artificial Space Objects.” 2020.
+}
 }
 \keyword{datasets}

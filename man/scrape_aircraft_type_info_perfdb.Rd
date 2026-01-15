@@ -9,7 +9,7 @@ scrape_aircraft_type_info_perfdb(ac_type, session)
 \arguments{
 \item{ac_type}{ICAO aircraft type}
 
-\item{session}{`polite` session}
+\item{session}{\code{polite} session}
 }
 \value{
 a dataframe of aircraft info

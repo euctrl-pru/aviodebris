@@ -13,17 +13,17 @@ hexagonize_traffic(
 }
 \arguments{
 \item{day}{the date for the trajectories, it refers to the relevant
-parquet file in `data/trajectories_<YYYY-MM-DD>_resampled_<interval>s.parquet`}
+parquet file in \verb{data/trajectories_<YYYY-MM-DD>_resampled_<interval>s.parquet}}
 
 \item{resolution}{the H3 resolution}
 
 \item{interval}{resampling interval}
 
-\item{bbox}{a bounding box with names `xmin`, `xmax`, `ymin` and `ymax`}
+\item{bbox}{a bounding box with names \code{xmin}, \code{xmax}, \code{ymin} and \code{ymax}}
 }
 \value{
 a new parquet file as
-  `data/trajectories_<YYYY-MM-DD>_resampled_<interval>s_bbox_res_<resolution>.parquet`
+\verb{data/trajectories_<YYYY-MM-DD>_resampled_<interval>s_bbox_res_<resolution>.parquet}
 }
 \description{
 Keep only portions in the BBOX of the study

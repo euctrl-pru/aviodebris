@@ -9,10 +9,10 @@ bbox_of_hexes_for_bbox_at_res(bbox, resolution)
 \arguments{
 \item{bbox}{the user bounding box}
 
-\item{resolution}{the resolution of the H3 hexagons covering `bbox`}
+\item{resolution}{the resolution of the H3 hexagons covering \code{bbox}}
 }
 \value{
-the bounding box containing the H3 hexagons covering `bbox`
+the bounding box containing the H3 hexagons covering \code{bbox}
 }
 \description{
 Return the bounding box of the H3 hexagons covering a user bounding box.

@@ -21,7 +21,7 @@
 #'   - `R1`--`R5`: Stage number for launch vehicle stage.
 #'   - `C..[A|M]`: a component, i.e. a functional part of the spacecraft or
 #'         rocket that is deliberately or accidentally ejected.
-#' * `inclination`: the orbit inclination in the [-90, 90] interval.
+#' * `inclination`: the orbit inclination in the \[-90, 90\] interval.
 #' * `reentry_date`: the date of reentry in ["vague date" format](https://planet4589.org/space/gcat/web/intro/vague.html).
 #' * `dry_mass`: the (poosibly estimated) dry mass.
 #'

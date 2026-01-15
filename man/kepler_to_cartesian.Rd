@@ -19,7 +19,7 @@ periapsis to the position vector along the direction of motion
 
 \item{Omega}{the Right ascension of the ascending node [radians]}
 
-\item{w}{the argument of perigee [radians]}
+\item{w}{the argument of perigee \[radians\]}
 
 \item{M}{the mass of the first body (more massive one), i.e. Earth, [kg]}
 

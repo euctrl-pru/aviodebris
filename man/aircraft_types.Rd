@@ -6,12 +6,14 @@
 \title{Aircraft type info}
 \format{
 A data frame with 322 rows and 15 columns:
-* `icao`: the ICAO aircraft type code.
-* `name`: the aircraft type name.
-* `manufacturer`: the manufacturer.
-* `type`: the type, i.e. L2J for **L**andplane **2** **J**et engines craft
-* `wtc`: Wake Turbulence Category
-* `...`: the rest
+\itemize{
+\item \code{icao}: the ICAO aircraft type code.
+\item \code{name}: the aircraft type name.
+\item \code{manufacturer}: the manufacturer.
+\item \code{type}: the type, i.e. L2J for \strong{L}andplane \strong{2} \strong{J}et engines craft
+\item \code{wtc}: Wake Turbulence Category
+\item \code{...}: the rest
+}
 }
 \usage{
 aircraft_types

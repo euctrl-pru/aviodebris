@@ -6,9 +6,11 @@
 \title{Effective Exposed Area}
 \format{
 A data frame with columns:
-* `icao`: the ICAO aircraft type code.
-* `eea`: the effective exposed area.
-* `pax`: the max number of passengers.
+\itemize{
+\item \code{icao}: the ICAO aircraft type code.
+\item \code{eea}: the effective exposed area.
+\item \code{pax}: the max number of passengers.
+}
 }
 \usage{
 effective_exposed_area

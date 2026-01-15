@@ -6,7 +6,7 @@
 #' @param interval number of seconds between samples [30]
 #'
 #' @export
-#'
+#' @noMd
 #' @returns a data frame of resampled points is saved in
 #'          `data/trajectories_<YYYY-MM-DD>_resampled_<interval>s.parquet`
 #'

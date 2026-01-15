@@ -6,8 +6,10 @@
 \title{Debris hourly density function per H3 hex cell at resolution 3}
 \format{
 A data frame with 360 * 720 rows and 1 column:
-* `h3_resolution_3`: the H3 cell id
-* `w`: the value of the hourly weighting function.
+\itemize{
+\item \code{h3_resolution_3}: the H3 cell id
+\item \code{w}: the value of the hourly weighting function.
+}
 }
 \usage{
 weightings_h3_resolution_3_hourly
