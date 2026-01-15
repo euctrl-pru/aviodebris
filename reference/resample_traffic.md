@@ -1,6 +1,6 @@
-# reasample a day of trajectories at 30s
+# reasample a day of trajectories at interval
 
-reasample a day of trajectories at 30s
+reasample a day of trajectories at interval
 
 ## Usage
 
@@ -22,4 +22,4 @@ resample_traffic(day, interval = 30L)
 ## Value
 
 a data frame of resampled points is saved in
-\`data/trajectories\_\<YYYY-MM-DD\>\_resampled_30s.parquet\`
+\`data/trajectories\_\<YYYY-MM-DD\>\_resampled\_\<interval\>s.parquet\`
