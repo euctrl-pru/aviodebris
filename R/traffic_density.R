@@ -53,7 +53,7 @@ traffic_density_hourly <- function(day, resolution = 3L, interval = 30L) {
       cell_area_m2 = h3jsr::cell_area(.data$cell, units = c("m2")),
       density_m2 = .data$occupancy / .data$cell_area_m2
     ) |>
-    dplyr::select(-.data$cell_area_m2) |>
+    dplyr::select(-"cell_area_m2") |>
     dplyr::arrange(.data$occupancy)
 
   arrow::write_parquet(out, here::here("data", fo), compression = "gzip")

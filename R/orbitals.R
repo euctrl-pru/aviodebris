@@ -48,7 +48,7 @@ kepler_to_cartesian <- function(
   mu <- G * (M + m) # standard gravitational parameter
 
   p <- a * (1 - e * e) # semi-parameter (semi-latus rectum)
-  r_0 = p / (1 + e * cos(nu))
+  r_0 <- p / (1 + e * cos(nu))
 
   #--------------- Coordinates in the perifocal reference system Oxyz -----------------
   # position vector coordinates
@@ -115,7 +115,7 @@ latitude_weights <- function(delta_lat, altitude, inclination_deg, n = 10001L) {
   vals <- vector("numeric", nlat)
 
   if (inclination_deg == 0) {
-    vals[1 + nlat / 2] = 1
+    vals[1 + nlat / 2] <- 1
     res <- tibble::tibble(lat = lats, val = vals)
   } else {
     to_tibble <- function(x, colnames) {
@@ -141,7 +141,7 @@ latitude_weights <- function(delta_lat, altitude, inclination_deg, n = 10001L) {
         ) |>
           to_tibble(c("i", "j", "k", "vi", "vj", "vk"))
       ) |>
-      tidyr::unnest(.data$cartesian) |>
+      tidyr::unnest(cols = "cartesian") |>
       dplyr::mutate(
         radius = sqrt(
           .data$i * .data$i + .data$j * .data$j + .data$k * .data$k

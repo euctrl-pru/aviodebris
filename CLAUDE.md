@@ -96,7 +96,8 @@ This package follows tidyverse style conventions:
 - Use `.by` argument in `summarise()`/`mutate()` instead of `group_by() |> ... |> ungroup()`
 - Use snake_case for function and variable names
 - Prefix external package functions with namespace (e.g., `dplyr::filter()`)
-- Use `.data` pronoun in tidyselect contexts for R CMD check compliance
+- Use the `.data` pronoun in data-masking contexts (`filter()`, `mutate()`, `summarise()`, ...) for R CMD check compliance
+- In tidyselect contexts (`select()`, `unnest()`, `pivot_*()`, `.by`, ...) use quoted column names (e.g. `select(-"x")`), not `.data$x` (deprecated since tidyselect 1.2.0)
 
 ## Dependencies
 
