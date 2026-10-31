@@ -17,8 +17,9 @@ in \verb{data/}}
 \item{interval}{resampling interval}
 }
 \value{
-save the result in a parquet file
-\verb{traffic_density_<YYYY-MM-DD>_hourly.parquet}
+(invisibly) a data frame of hourly \code{occupancy} and \code{density_m2}
+per cell and aircraft type. Called for its side effect of writing
+\verb{data/traffic_density_<YYYY-MM-DD>_res_<resolution>_hourly.parquet}
 }
 \description{
 Calculated the hourly traffic density per aircraft type

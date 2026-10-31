@@ -10,8 +10,9 @@
 #'
 #' @export
 #'
-#' @returns a new parquet file as
-#'   `data/trajectories_<YYYY-MM-DD>_resampled_<interval>s_bbox_res_<resolution>.parquet`
+#' @returns (invisibly) the trajectory points within `bbox` with added `cell`
+#'   and `h3_resolution` columns. Called for its side effect of writing
+#'   `data/trajectories_<YYYY-MM-DD>_resampled_<interval>s_bbox_res_<resolution>.parquet`.
 #'
 hexagonize_traffic <- function(
   day,
@@ -30,7 +31,7 @@ hexagonize_traffic <- function(
   fn_out <- "trajectories_{date}_resampled_{interval}s_bbox_res_{resolution}.parquet" |>
     stringr::str_glue()
 
-  here::here("data", fn_in) |>
+  out <- here::here("data", fn_in) |>
     arrow::read_parquet() |>
     # fmt: skip
     # filter on bbox
@@ -46,6 +47,8 @@ hexagonize_traffic <- function(
       ),
       cell = as.character(.data$cell),
       h3_resolution = resolution
-    ) |>
-    arrow::write_parquet(here::here("data", fn_out))
+    )
+
+  arrow::write_parquet(out, here::here("data", fn_out))
+  invisible(out)
 }

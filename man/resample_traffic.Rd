@@ -13,7 +13,8 @@ parquet file in `data-raw/trjs/trjs_<YYYY-MM-DD>.parquet`}
 \item{interval}{number of seconds between samples [30]}
 }
 \value{
-a data frame of resampled points is saved in
+(invisibly) a data frame of resampled points. Called for its side
+         effect of writing
          `data/trajectories_<YYYY-MM-DD>_resampled_<interval>s.parquet`
 }
 \description{

@@ -22,8 +22,9 @@ parquet file in \verb{data/trajectories_<YYYY-MM-DD>_resampled_<interval>s.parqu
 \item{bbox}{a bounding box with names \code{xmin}, \code{xmax}, \code{ymin} and \code{ymax}}
 }
 \value{
-a new parquet file as
-\verb{data/trajectories_<YYYY-MM-DD>_resampled_<interval>s_bbox_res_<resolution>.parquet}
+(invisibly) the trajectory points within \code{bbox} with added \code{cell}
+and \code{h3_resolution} columns. Called for its side effect of writing
+\verb{data/trajectories_<YYYY-MM-DD>_resampled_<interval>s_bbox_res_<resolution>.parquet}.
 }
 \description{
 Keep only portions in the BBOX of the study

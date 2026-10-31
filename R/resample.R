@@ -7,7 +7,8 @@
 #'
 #' @export
 #' @noMd
-#' @returns a data frame of resampled points is saved in
+#' @returns (invisibly) a data frame of resampled points. Called for its side
+#'          effect of writing
 #'          `data/trajectories_<YYYY-MM-DD>_resampled_<interval>s.parquet`
 #'
 resample_traffic <- function(day, interval = 30L) {
@@ -15,8 +16,10 @@ resample_traffic <- function(day, interval = 30L) {
   fi <- stringr::str_glue("trjs_{date}.parquet")
   fo <- stringr::str_glue("trajectories_{date}_resampled_{interval}s.parquet")
 
-  here::here("data-raw", "trjs", fi) |>
+  out <- here::here("data-raw", "trjs", fi) |>
     arrow::read_parquet() |>
-    trrrj::resample(interval) |>
-    arrow::write_parquet(here::here("data", fo))
+    trrrj::resample(interval)
+
+  arrow::write_parquet(out, here::here("data", fo))
+  invisible(out)
 }

@@ -3,9 +3,9 @@
 #' @param day date to calculate for
 #' @param resolution H3 hex resolution
 #'
-#' @returns a dataframe with hourly `collision_expectation` and
-#'          `casualty_risk`, saved in a parquet file
-#'          `collision_and_casualty_hourly.parquet`
+#' @returns (invisibly) a data frame with hourly `collision_expectation` and
+#'          `casualty_risk` per cell. Called for its side effect of writing
+#'          `data/collision_and_casualty_<YYYY-MM-DD>_res_<resolution>_hourly.parquet`.
 #' @export
 #'
 collision_and_casualty_risk_expectation_hourly <- function(
@@ -20,7 +20,7 @@ collision_and_casualty_risk_expectation_hourly <- function(
     "collision_and_casualty_{date}_res_{resolution}_hourly.parquet"
   )
 
-  here::here("data", fi) |>
+  out <- here::here("data", fi) |>
     arrow::read_parquet() |>
     dplyr::filter(.data$h3_resolution == resolution) |>
     dplyr::left_join(
@@ -53,6 +53,8 @@ collision_and_casualty_risk_expectation_hourly <- function(
       collision_expectation = sum(.data$collision_expectation),
       casualty_risk = sum(.data$casualty_risk),
       .by = c("year", "month", "day", "hour", "cell")
-    ) |>
-    arrow::write_parquet(here::here("data", fo), compression = "gzip")
+    )
+
+  arrow::write_parquet(out, here::here("data", fo), compression = "gzip")
+  invisible(out)
 }

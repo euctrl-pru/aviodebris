@@ -12,9 +12,9 @@ collision_and_casualty_risk_expectation_hourly(day, resolution = 3L)
 \item{resolution}{H3 hex resolution}
 }
 \value{
-a dataframe with hourly \code{collision_expectation} and
-\code{casualty_risk}, saved in a parquet file
-\code{collision_and_casualty_hourly.parquet}
+(invisibly) a data frame with hourly \code{collision_expectation} and
+\code{casualty_risk} per cell. Called for its side effect of writing
+\verb{data/collision_and_casualty_<YYYY-MM-DD>_res_<resolution>_hourly.parquet}.
 }
 \description{
 Calculate hourly collision and casualty risk expectation

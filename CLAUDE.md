@@ -31,6 +31,7 @@ aviodebris/
 │   ├── gcat.R                  # Process GCAT debris reentry catalog
 │   ├── weighting_function.R    # Generate probability weights
 │   └── gcat/                   # Raw GCAT TSV files
+├── tests/testthat/             # Unit tests (testthat)
 └── man/                        # Auto-generated roxygen2 documentation
 ```
 
@@ -120,10 +121,10 @@ Key dependencies:
 - ~~Fix dataset name inconsistency: `effective_expose_area` → `effective_exposed_area`~~ ✓ Finished
 
 ### Design Improvements
-- Functions write side-effects only; consider returning data invisibly
+- ~~Functions write side-effects only; consider returning data invisibly~~ ✓ Fixed (pipeline functions write parquet and explicitly return `invisible(out)`)
 - Scraper functions have significant duplication; consider factory pattern
 - Add input validation with `cli::cli_abort()`
-- Add unit tests for `kepler_to_cartesian()` and `latitude_weights()`
+- ~~Add unit tests for `kepler_to_cartesian()` and `latitude_weights()`~~ ✓ Done (`tests/testthat/test-orbitals.R`)
 
 ### Performance Improvements
 - `plot_hexes_map()`: `hexes_for_bbox_at_res()` called twice with same args

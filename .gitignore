@@ -1,6 +1,3 @@
-# revert parent ignores
-!*
-
 data-raw/
 
 # from https://github.com/github/gitignore/blob/main/R.gitignore

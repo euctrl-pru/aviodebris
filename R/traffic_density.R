@@ -10,8 +10,9 @@
 #'
 #' @export
 #'
-#' @returns save the result in a parquet file
-#'          `traffic_density_<YYYY-MM-DD>_hourly.parquet`
+#' @returns (invisibly) a data frame of hourly `occupancy` and `density_m2`
+#'          per cell and aircraft type. Called for its side effect of writing
+#'          `data/traffic_density_<YYYY-MM-DD>_res_<resolution>_hourly.parquet`
 #'
 traffic_density_hourly <- function(day, resolution = 3L, interval = 30L) {
   dd <- day |> lubridate::as_date()
@@ -23,7 +24,7 @@ traffic_density_hourly <- function(day, resolution = 3L, interval = 30L) {
     "traffic_density_{date}_res_{resolution}_hourly.parquet"
   )
 
-  here::here("data", fi) |>
+  out <- here::here("data", fi) |>
     arrow::read_parquet() |>
     dplyr::mutate(
       year = lubridate::year(.data$timestamp) |> as.integer(),
@@ -53,6 +54,8 @@ traffic_density_hourly <- function(day, resolution = 3L, interval = 30L) {
       density_m2 = .data$occupancy / .data$cell_area_m2
     ) |>
     dplyr::select(-.data$cell_area_m2) |>
-    dplyr::arrange(.data$occupancy) |>
-    arrow::write_parquet(here::here("data", fo), compression = "gzip")
+    dplyr::arrange(.data$occupancy)
+
+  arrow::write_parquet(out, here::here("data", fo), compression = "gzip")
+  invisible(out)
 }
