@@ -87,7 +87,7 @@ coe2rv <- function(
   r_pqw <- temp * c(cosnu, sinnu, units::set_units(0.0))
 
   if (abs(p) < units::set_units(0.0001, "km")) {
-    p = units::set_units(0.0001, "km")
+    p <- units::set_units(0.0001, "km")
   }
 
   v_pqw <- sqrt(mu / p) * c(-sinnu, (ecc + cosnu), units::set_units(0.0))
@@ -210,7 +210,7 @@ mag <- function(x) {
 #' }
 ecef2ll <- function(r) {
   pi <- pi |> units::set_units("rad")
-  small <- 0.00000001 # small value for tolerances
+  small <- 1e-8 # small value for tolerances
   re <- 6378.1363 |> units::set_units("km")
   eesqrd <- 0.006694385000 |> units::set_units() # eccentricity of earth sqrd
 
@@ -222,7 +222,7 @@ ecef2ll <- function(r) {
   if (abs(temp) < units::set_units(small, "km")) {
     rtasc <- sign(r[3]) * pi * 0.5
   } else {
-    rtasc = atan2(r[2], r[1]) |>
+    rtasc <- atan2(r[2], r[1]) |>
       units::set_units(NULL) |>
       units::set_units("rad")
   }
@@ -231,7 +231,7 @@ ecef2ll <- function(r) {
 
   if (abs(lon) >= pi) {
     if (lon < 0.0) {
-      lon <- 2 * pi + lon
+      lon <- lon + 2 * pi
     } else {
       lon <- lon - 2 * pi
     }
@@ -247,7 +247,7 @@ ecef2ll <- function(r) {
   while (
     (abs(olddelta - latgd) >= units::set_units(small, "rad")) && (i < 10)
   ) {
-    olddelta = latgd
+    olddelta <- latgd
     sintemp <- sin(latgd)
     c <- re / (sqrt(units::set_units(1.0) - eesqrd * sintemp * sintemp))
     latgd <- atan((r[3] + c * eesqrd * sintemp) / temp)
@@ -270,6 +270,87 @@ ecef2ll <- function(r) {
   )
 }
 
+
+#' convert a geocentric equatorial position vector into latitude and longitude
+#'
+#' This function finds both geodetic and geocentric latitude.
+#' Algorithm by Borkowski, K. M. 1989. "Accurate Algorithms to Transform
+#' Geocentric to Geodetic Coordinates." Bulletin Geodesique Vol. 63: 50-56.
+#'
+#' @param r ECEF (I, J, K) position vector [km]
+#'
+#' @returns a list of the following named values
+#'          * `latgc`: geocentric latitude of satellite, \eqn{[-\pi/2, \pi/2]} [rad]
+#'          * `latgd`: geodetic latitude of satellite, \eqn{[-\pi/2, \pi/2]} [rad]
+#'          * `lon`: longitude of satellite, \eqn{[-\pi, \pi]} [rad]
+#'          * `hellp`: height above the ellipsoid, [km]
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' r <- c(
+#'   i = 6524.834,
+#'   j = 6862.875,
+#'   k = 6448.296
+#' ) |>
+#'   units::set_units("km")
+#'
+#' res <- ecef2llb(r)
+#' }
+ecef2llb <- function(r) {
+  # Constants
+  third <- 1.0 / 3.0
+  # Compute magnitude of the position vector
+  magr <- mag(r)
+
+  # Earth semi-major and semi-minor axes
+  a <- mean_equatorial_radius_earth
+  b <- sign(r[3]) * a * sqrt(units::set_units(1.0) - squared_eccentricity_earth)
+  # Compute longitude (right ascension approximation)
+  names(r) <- NULL
+  temp <- sqrt(r[1] * r[1] + r[2] * r[2])
+  if (abs(temp) < units::set_units(small, "km")) {
+    lon <- sign(r[3]) * pi * 0.5
+  } else {
+    lon <- atan2(r[2], r[1]) |>
+      units::set_units(NULL)
+  }
+  # Adjust longitude to be within [-2π, 2π] range
+  if (abs(lon) >= pi) {
+    if (lon < 0.0) {
+      lon <- lon + 2 * pi
+    } else {
+      lon <- lon - 2 * pi
+    }
+  }
+  lon <- lon |> units::set_units("rad")
+
+  # Intermediate variables for polynomial solution
+  atemp <- 1 / (a * temp)
+  e <- (b * r[3] - a * a + b * b) * atemp
+  f <- (b * r[3] + a * a - b * b) * atemp
+  p <- 4 * third * (e * f + units::set_units(1.0))
+  q <- 2 * (e * e - f * f)
+  d <- p^3 + q^2
+  # Solve the cubic equation based on the discriminant `d`
+  if (d > units::set_units(0.0)) {
+    nu <- (sqrt(d) - q)^third - (sqrt(d) + q)^third
+  } else {
+    sqrtp <- sqrt(-p)
+    nu <- 2 * sqrtp * cos(third * acos(q / (p * sqrtp)))
+  }
+  # Intermediate variables for latitude and height computations
+  g <- 0.5 * (sqrt(e^2 + nu) + e)
+  t <- sqrt(g^2 + (f - nu * g) / (2 * g - e)) - g
+  # Compute geodetic latitude and height above the ellipsoid
+  latgd <- atan(a * (units::set_units(1.0) - t^2) / (2 * b * t))
+  hellp <- (temp - a * t) * cos(latgd) + (r[3] - b) * sin(latgd)
+  # Compute geocentric latitude
+  latgc <- asin(r[3] / magr)
+  return(
+    list(latgc = latgc, latgd = latgd, lon = lon, hellp = hellp)
+  )
+}
 
 interval_modulus <- function(x, a, b) {
   if (a == b) {
