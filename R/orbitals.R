@@ -30,7 +30,8 @@
 #'   nu = 0.5,
 #'   a = rE + alt,
 #'   e = ecc,
-#'   i = i, Omega = o,
+#'   i = i,
+#'   Omega = o,
 #'   w = w,
 #'   m = m)
 #' }
@@ -48,7 +49,7 @@ kepler_to_cartesian <- function(
   mu <- G * (M + m) # standard gravitational parameter
 
   p <- a * (1 - e * e) # semi-parameter (semi-latus rectum)
-  r_0 = p / (1 + e * cos(nu))
+  r_0 <- p / (1 + e * cos(nu))
 
   #--------------- Coordinates in the perifocal reference system Oxyz -----------------
   # position vector coordinates
@@ -68,13 +69,13 @@ kepler_to_cartesian <- function(
     sinw <- sin(w)
     cosi <- cos(i)
     sini <- sin(i)
-    I = (cosO * cosw - sinO * sinw * cosi) * x + (-cosO * sinw - sinO * cosw * cosi) * y
-    J = (sinO * cosw + cosO * sinw * cosi) * x + (-sinO * sinw + cosO * cosw * cosi) * y
-    K = (sinw * sini) * x                                    + (cosw * sini) * y
+    I <- (cosO * cosw - sinO * sinw * cosi) * x + (-cosO * sinw - sinO * cosw * cosi) * y
+    J <- (sinO * cosw + cosO * sinw * cosi) * x + (-sinO * sinw + cosO * cosw * cosi) * y
+    K <- (sinw * sini) * x                                    + (cosw * sini) * y
     # velocity vector components I', J', and K'
-    Vi = (cosO * cosw - sinO * sinw * cosi) * Vx_ + (-cosO * sinw - sinO * cosw * cosi) * Vy_
-    Vj = (sinO * cosw + cosO * sinw * cosi) * Vx_ + (-sinO * sinw + cosO * cosw * cosi) * Vy_
-    Vk = (sinw * sini) * Vx_                                    + (cosw * sini) * Vy_
+    Vi <- (cosO * cosw - sinO * sinw * cosi) * Vx_ + (-cosO * sinw - sinO * cosw * cosi) * Vy_
+    Vj <- (sinO * cosw + cosO * sinw * cosi) * Vx_ + (-sinO * sinw + cosO * cosw * cosi) * Vy_
+    Vk <- (sinw * sini) * Vx_                                    + (cosw * sini) * Vy_
   }
   return(
     c(i = I, j = J, k = K, vi = Vi, vj = Vj, vk = Vk)
@@ -115,7 +116,7 @@ latitude_weights <- function(delta_lat, altitude, inclination_deg, n = 10001L) {
   vals <- vector("numeric", nlat)
 
   if (inclination_deg == 0) {
-    vals[1 + nlat / 2] = 1
+    vals[1 + nlat / 2] <- 1
     res <- tibble::tibble(lat = lats, val = vals)
   } else {
     to_tibble <- function(x, colnames) {
