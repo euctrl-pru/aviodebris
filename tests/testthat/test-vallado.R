@@ -158,3 +158,22 @@ test_that("newtonnu elliptical case", {
   expect_equal(res$e0 * 180 / pi, 41.078960346507934)
   expect_equal(res$m * 180 / pi, 37.31406335764441)
 })
+
+test_that("rv2coe - coe2rv roundtrip", {
+  r <- c(i = 6524.834, j = 6862.875, k = 6448.296)
+  v <- c(vi = 4.901327, vj = 5.533756, vk = -1.976341)
+  res1 <- rv2coe(r, v)
+  res2 <- coe2rv(
+    p = res1$p,
+    ecc = res1$ecc,
+    incl = res1$incl,
+    raan = res1$raan,
+    argp = res1$argp,
+    nu = res1$nu, # rad
+    arglat = res1$arglat, # rad
+    truelon = res1$truelon, # rad
+    lonper = res1$lonper # rad
+  )
+  expect_equal(res2$r, r)
+  expect_equal(res2$v, v)
+})
