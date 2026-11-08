@@ -143,3 +143,72 @@ test_that("rv2coe round trip: circular equatorial", {
     expect_true(is.na(s$nu))
   }
 })
+
+# Hyperbolic and parabolic orbits -------------------------------------------
+# test_kepler.py has no orbital-element references, so these use the
+# (ecc, m, nu) triples from test_newton.py::test_newtonm in
+# https://github.com/CelesTrak/fundamentals-of-astrodynamics/
+# For ecc >= 1, m is Vallado's hyperbolic/parabolic mean-anomaly analogue.
+
+test_that("newtonnu hyperbolic and parabolic (test_newtonm inverse)", {
+  expect_equal(newtonnu(1.5, 1.8916928725677562)$m, pi / 2)
+  expect_equal(newtonnu(1.5, 1.8916928725677562)$e0, 1.449742150875263)
+  expect_equal(newtonnu(1, 1.1949025292471007)$m, pi / 4)
+  expect_equal(newtonnu(1, 1.1949025292471007)$e0, 0.6804016596037228)
+})
+
+test_that("rv2coe hyperbolic inclined via coe2rv (test_newtonm values)", {
+  p <- 20000
+  ecc <- 1.5
+  nu <- 1.8916928725677562
+  sv <- coe2rv(p, ecc, 30 * deg, 40 * deg, 50 * deg, nu)
+  s <- rv2coe(sv$r, sv$v)
+
+  expect_equal(s$orbit_type, "eph_inclined")
+  expect_equal(s$p, p)
+  expect_equal(s$ecc, ecc)
+  expect_equal(s$a, p / (1 - ecc^2))
+  expect_lt(s$a, 0)
+  expect_equal(unname(s$incl) / deg, 30)
+  expect_equal(unname(s$raan) / deg, 40)
+  expect_equal(unname(s$argp) / deg, 50)
+  expect_equal(unname(s$nu), nu)
+  expect_equal(s$m, pi / 2)
+})
+
+test_that("rv2coe parabolic inclined via coe2rv (test_newtonm values)", {
+  p <- 20000
+  nu <- 1.1949025292471007
+  sv <- coe2rv(p, 1, 30 * deg, 40 * deg, 50 * deg, nu)
+  s <- rv2coe(sv$r, sv$v)
+
+  expect_equal(s$orbit_type, "eph_inclined")
+  expect_equal(s$p, p)
+  expect_equal(s$ecc, 1)
+  # specific energy is ~0 but rounds to slightly nonzero, so |a| is huge
+  expect_gt(abs(s$a), 1e9)
+  expect_equal(unname(s$nu), nu)
+  expect_equal(s$m, pi / 4)
+})
+
+test_that("rv2coe hyperbolic equatorial via coe2rv", {
+  p <- 20000
+  ecc <- 1.5
+  nu <- 1.8916928725677562
+  sv <- coe2rv(p, ecc, 0, 0, 0, nu, lonper = 70 * deg)
+  s <- rv2coe(sv$r, sv$v)
+
+  expect_equal(s$orbit_type, "eph_equatorial")
+  expect_equal(s$ecc, ecc)
+  expect_equal(unname(s$lonper) / deg, 70)
+  expect_equal(unname(s$nu), nu)
+  expect_equal(s$m, pi / 2)
+})
+
+test_that("newtonnu hyperbolic (test_newtone case, corrected sign)", {
+  # Upstream test_newtone expects nu = -2.7523; its newtone() drops the
+  # minus sign on sin(nu) (Vallado Alg. 6), so the correct nu is positive.
+  res <- newtonnu(1.05, 2.752304611108218)
+  expect_equal(res$e0, 123.45 * pi / 180)
+  expect_equal(res$m, 2.3123894903995055)
+})
