@@ -29,6 +29,21 @@ test_that("latitude_weights for i=0 is a spike at equator", {
   expect_equal(lw$lat[which.max(lw$val)], 0, tolerance = 0.5)
 })
 
+test_that("latitude_weights returns ascending latitudes for all inclinations", {
+  rE <- 6378e3
+  alt <- 500e3
+  for (inc in c(0, 10, 50, 90, 170)) {
+    lw <- latitude_weights(0.5, rE + alt, inc)
+    expect_false(is.unsorted(lw$lat))
+  }
+  # same latitude grid regardless of inclination, so results can be bound
+  # column-wise (as in data-raw/weighting_function.R)
+  expect_identical(
+    latitude_weights(0.5, rE + alt, 0)$lat,
+    latitude_weights(0.5, rE + alt, 50)$lat
+  )
+})
+
 test_that("latitude_weights for i=90 is symmetric about poles", {
   rE <- 6378e3
   alt <- 500e3

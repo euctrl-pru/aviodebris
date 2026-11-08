@@ -106,8 +106,7 @@ latitude_weights <- function(delta_lat, altitude, inclination_deg, n = 10001L) {
   if (inclination_deg == 0) {
     vals <- numeric(nlat)
     vals[1 + nlat / 2] <- 1
-    # NOTE: unlike the inclined case, latitudes here stay in descending order
-    return(tibble::tibble(lat = lats, val = vals))
+    return(tibble::tibble(lat = lats, val = vals) |> dplyr::arrange(.data$lat))
   }
 
   # sample n equally spaced positions along a circular inclined orbit;
