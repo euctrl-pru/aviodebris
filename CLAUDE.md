@@ -78,12 +78,25 @@ Ports of algorithms from D. Vallado, *Fundamentals of Astrodynamics and Applicat
 
 | Dataset | Description |
 |---------|-------------|
-| `reentries_gcat` | 25 years of debris reentries (2000-2025) from GCAT |
-| `weightings_half_degree_latitude` | Latitude-based debris probability weights |
+| `reentries_gcat` | 25 years of debris reentries (2000-2025) from GCAT; `inclination` in degrees, **[0, 180]** (> 90 = retrograde) |
+| `weightings_half_degree_latitude` | Latitude-based debris probability weights (360 bands, ascending `lat`, sums to 1) |
 | `weightings_half_degree_hourly` | Half-degree grid hourly weights |
 | `weightings_h3_resolution_3_hourly` | H3 resolution 3 cell hourly weights |
 | `aircraft_types` | Aircraft type characteristics (322 types) |
 | `effective_exposed_area` | Effective exposed area and max passengers per aircraft type |
+
+### Inclination convention
+
+Inclination is always in **[0, 180] degrees**, as in GCAT's `Inc` column. Values above 90 are retrograde orbits (mostly sun-synchronous, ~97-99 deg). Never wrap it into [-90, 90] like a latitude: `coe2rv()` would classify a negative inclination as equatorial. `latitude_weights()` aborts outside [0, 180]. For latitude coverage only sin(i) matters, so 98 deg gives the same weights as 82 deg.
+
+### Regenerating datasets
+
+`data-raw/gcat.R` writes `reentries_gcat`; `data-raw/weighting_function.R` reads it and writes the three `weightings_*` datasets (~30 s). Run them in that order. `weighting_function.R` calls `library(aviodebris)`, so run `devtools::install()` (or replace that line with `devtools::load_all()`) first, otherwise it uses the installed, possibly stale, package. After regenerating, compare against the previous `.rda` files before committing, and re-run the risk pipeline: existing parquet outputs keep the old weights.
+
+Last regenerated in commit `2b1d512` (Nov 2026):
+- `reentries_gcat`: 325 retrograde inclinations unwrapped (e.g. -82 → 98); other columns identical
+- `weightings_half_degree_latitude` / `_hourly`: only the ±0.25 deg bands changed (±1/1968), from fixing the i = 0 latitude order in `latitude_weights()`
+- `weightings_h3_resolution_3_hourly`: 581 equatorial cells changed by up to 7.9%; same 41,162 cells
 
 ## Common Commands
 
@@ -97,7 +110,7 @@ devtools::check()
 # Regenerate documentation
 devtools::document()
 
-# Regenerate datasets (run from project root)
+# Regenerate datasets (run from project root, in this order; see "Regenerating datasets")
 source("data-raw/gcat.R")
 source("data-raw/weighting_function.R")
 
@@ -147,6 +160,8 @@ Key dependencies:
 - ~~`hexagonize.R`: Parameter `day` is shadowed by `lubridate::day(date)` assignment~~ ✓ Fixed (renamed to `day_of_month`)
 
 - ~~`rv2coe()`: orbit-type names mismatched `determine_orbit_type()` (`cir_*` vs `circular_*`), so circular elements were never computed~~ ✓ Fixed
+- ~~`data-raw/gcat.R`: wrapped inclination into [-90, 90], making 325 retrograde objects negative~~ ✓ Fixed (keeps GCAT's [0, 180]; datasets regenerated)
+- ~~`latitude_weights()`: i = 0 returned latitudes in descending order, misplacing that object's weight when results are bound by row~~ ✓ Fixed
 
 ### Vallado TODOs
 - No independent reference values for hyperbolic/parabolic `rv2coe()` (only round trips + `test_newtonm` anomalies)
