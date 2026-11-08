@@ -166,8 +166,7 @@ rv2coe <- function(r, v, mu = gravitational_constant_earth) {
   # if h_mag < 0:
   #     return p, a, ecc, incl, raan, argp, nu, m, arglat, truelon, lonper, orbit_type
   if (h_mag < 0) {
-    return
-    list(
+    return(list(
       p = p,
       a = a,
       ecc = ecc,
@@ -180,7 +179,7 @@ rv2coe <- function(r, v, mu = gravitational_constant_earth) {
       truelon = truelon,
       lonper = lonper,
       orbit_type = orbit_type
-    )
+    ))
   }
   # Define line of nodes vector
   # n_vec = np.array([-h[1], h[0], 0])
@@ -249,7 +248,7 @@ rv2coe <- function(r, v, mu = gravitational_constant_earth) {
   #     arglat = angle(n_vec, r)
   #     if r[2] < 0:
   #         arglat = adjust_angle(arglat)
-  if (orbit_type %in% c("cir_inclined", "eph_inclined")) {
+  if (orbit_type %in% c("circular_inclined", "eph_inclined")) {
     arglat <- angle(n_vec, r)
     if (r[3] < 0) {
       arglat <- adjust_angle(arglat)
@@ -278,7 +277,7 @@ rv2coe <- function(r, v, mu = gravitational_constant_earth) {
   #         truelon = adjust_angle(truelon)
   #     if incl > np.pi / 2:
   #         truelon = adjust_angle(truelon)
-  if (r_mag > small && orbit_type == "cir_equatorial") {
+  if (r_mag > small && orbit_type == "circular_equatorial") {
     truelon <- acos(clip(r[1] / r_mag, -1, 1))
     if (r[2] < 0) {
       truelon <- adjust_angle(truelon)
@@ -290,7 +289,8 @@ rv2coe <- function(r, v, mu = gravitational_constant_earth) {
   # Find mean anomaly for eccentric orbits
   # if np.isreal(ecc):
   #     _, m = newtonnu(ecc, nu)
-  if (is.double(ecc)) {
+  # nu is undefined (NA) for circular orbits, so m stays NA too
+  if (is.double(ecc) && !is.na(nu)) {
     m <- newtonnu(ecc, nu) |> magrittr::extract("m") |> as.numeric()
   }
   # return p, a, ecc, incl, raan, argp, nu, m, arglat, truelon, lonper, orbit_type
@@ -569,18 +569,14 @@ interval_modulus <- function(x, a, b) {
 determine_orbit_type <- function(ecc, incl, tol = small) {
   if (ecc < tol) {
     if ((incl < tol) || (abs(incl - pi) < tol)) {
-      return
-      "circular_equatorial"
+      return("circular_equatorial")
     } else {
-      return
-      "circular_inclined"
+      return("circular_inclined")
     }
   } else if ((incl < tol) || (abs(incl - pi) < tol)) {
-    return
-    "eph_equatorial"
+    return("eph_equatorial")
   } else {
-    return
-    "eph_inclined"
+    return("eph_inclined")
   }
 }
 
