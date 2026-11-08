@@ -1,13 +1,15 @@
 library(units)
 
+deg <- pi / 180
+
 test_that("coe2rv 2.6 (normal case)", {
   # Vallado, 2007, Ex. 2-6
   p <- 11067.790 # km
   ecc <- 0.83285
-  incl <- 87.87 * pi / 180 # rad
-  raan <- 227.89 * pi / 180 # rad
-  argp <- 53.38 * pi / 180 # rad
-  nu <- 92.335 * pi / 180 # rad
+  incl <- 87.87 * deg # rad
+  raan <- 227.89 * deg # rad
+  argp <- 53.38 * deg # rad
+  nu <- 92.335 * deg # rad
 
   # expected values from Python tests in
   # python/tests/astro/twobody/test_frame_conversions.py in repo
@@ -122,7 +124,7 @@ test_that("rv2coe ex 2.5", {
 test_that("coe2rv ex 5.5 (heliocentric)", {
   au <- 149597870.7 # km
   mu_sun <- 1.32712428e11 # km^3/s^2
-  deg <- pi / 180
+  deg <- deg
   res <- coe2rv(
     5.190373 * au,
     0.048486,
@@ -154,7 +156,7 @@ test_that("ecef2llb ex 3.3 (Borkowski values)", {
 })
 
 test_that("newtonnu elliptical case", {
-  res <- newtonnu(0.1, 45 * pi / 180)
+  res <- newtonnu(0.1, 45 * deg)
   expect_equal(res$e0 * 180 / pi, 41.078960346507934)
   expect_equal(res$m * 180 / pi, 37.31406335764441)
 })
@@ -176,4 +178,266 @@ test_that("rv2coe - coe2rv roundtrip", {
   )
   expect_equal(res2$r, r)
   expect_equal(res2$v, v)
+})
+
+
+# rv2coe orbit-type coverage ------------------------------------------------
+# State vectors and expected elements (deg) from Vallado's Fortran test suite
+# output, software/fortran/TESTASTF.OUT ("xx 150 ELORB" cases) in
+# https://github.com/CelesTrak/fundamentals-of-astrodynamics/
+# Inputs are printed to 7 decimals, so compare at 1e-6 relative tolerance.
+
+test_that("rv2coe elliptical inclined (TESTASTF)", {
+  s <- rv2coe(
+    r = c(7253.7557112, -6718.9042768, -5453.4308709),
+    v = c(5.1467799, 3.5740224, 0.3012640)
+  )
+  expect_equal(s$orbit_type, "eph_inclined")
+  expect_equal(s$p, 12246.02301693, tolerance = 1e-6)
+  expect_equal(s$ecc, 0.19999999, tolerance = 1e-6)
+  expect_equal(unname(s$incl) / deg, 29.9999997, tolerance = 1e-6)
+  expect_equal(unname(s$raan) / deg, 29.9999963, tolerance = 1e-6)
+  expect_equal(unname(s$argp) / deg, 220.0000078, tolerance = 1e-6)
+  expect_equal(unname(s$nu) / deg, 64.9999940, tolerance = 1e-6)
+  expect_equal(unname(s$m) / deg, 45.5811664, tolerance = 1e-6)
+})
+
+test_that("rv2coe elliptical inclined retrograde (TESTASTF)", {
+  s <- rv2coe(
+    r = c(6736.5513062, -5709.0206792, -525.3690581),
+    v = c(-4.7282517, -4.9753015, 1.1606611)
+  )
+  expect_equal(s$orbit_type, "eph_inclined")
+  expect_equal(s$p, 9471.40649760, tolerance = 1e-6)
+  expect_equal(s$ecc, 0.10000006, tolerance = 1e-6)
+  expect_equal(unname(s$incl) / deg, 170.0000001, tolerance = 1e-6)
+  expect_equal(unname(s$raan) / deg, 299.9999875, tolerance = 1e-6)
+  expect_equal(unname(s$argp) / deg, 24.9999797, tolerance = 1e-6)
+  expect_equal(unname(s$nu) / deg, 315.0000077, tolerance = 1e-6)
+  expect_equal(unname(s$m) / deg, 322.6859477, tolerance = 1e-6)
+})
+
+test_that("rv2coe elliptical equatorial (TESTASTF)", {
+  s <- rv2coe(
+    r = c(-22739.1086596, -22739.1086596, 0),
+    v = c(2.4851400, -2.0200411, 0)
+  )
+  expect_equal(s$orbit_type, "eph_equatorial")
+  expect_equal(s$p, 26328.95469976, tolerance = 1e-6)
+  expect_equal(s$ecc, 0.2, tolerance = 1e-6)
+  expect_equal(unname(s$incl), 0)
+  expect_equal(unname(s$nu) / deg, 205.0, tolerance = 1e-6)
+  expect_equal(unname(s$m) / deg, 216.1768739, tolerance = 1e-6)
+  expect_equal(unname(s$lonper) / deg, 20.0, tolerance = 1e-6)
+  expect_true(is.na(s$raan))
+  expect_true(is.na(s$argp))
+})
+
+test_that("rv2coe elliptical equatorial retrograde (TESTASTF)", {
+  s <- rv2coe(
+    r = c(28242.3662822, 2470.8868808, 0),
+    v = c(0.6657522, -3.6253302, 0)
+  )
+  expect_equal(s$orbit_type, "eph_equatorial")
+  expect_equal(s$p, 27152.11430028, tolerance = 1e-6)
+  expect_equal(s$ecc, 0.1, tolerance = 1e-6)
+  expect_equal(unname(s$incl) / deg, 180)
+  expect_equal(unname(s$nu) / deg, 115.0, tolerance = 1e-6)
+  expect_equal(unname(s$m) / deg, 104.2906161, tolerance = 1e-6)
+  expect_equal(unname(s$lonper) / deg, 240.0, tolerance = 1e-6)
+})
+
+# The printed circular vectors give ecc ~ 1e-8 > SMALL (1e-10), so rv2coe
+# treats them as eccentric. Check the type-independent elements here; the
+# circular orbit types are covered by the exact round trips below.
+
+test_that("rv2coe circular inclined (TESTASTF, near-circular inputs)", {
+  s1 <- rv2coe(
+    r = c(-2693.3455501, 6428.4342536, 4491.3778205),
+    v = c(-3.9548471, -4.2809659, 3.7556710)
+  )
+  expect_equal(s1$p, 8291.64350005, tolerance = 1e-6)
+  expect_equal(s1$ecc, 0, tolerance = 1e-7)
+  expect_equal(unname(s1$incl) / deg, 50, tolerance = 1e-6)
+  expect_equal(unname(s1$raan) / deg, 80, tolerance = 1e-6)
+  expect_equal(unname(s1$arglat) / deg, 45, tolerance = 1e-6)
+
+  s2 <- rv2coe(
+    r = c(-7079.6883448, 3167.8771882, -2931.5386730),
+    v = c(1.7760808, 6.2377093, 2.4513402)
+  )
+  expect_equal(s2$p, 8291.64350001, tolerance = 1e-6)
+  expect_equal(s2$ecc, 0, tolerance = 1e-7)
+  expect_equal(unname(s2$incl) / deg, 150, tolerance = 1e-6)
+  expect_equal(unname(s2$raan) / deg, 115, tolerance = 1e-6)
+  expect_equal(unname(s2$arglat) / deg, 315, tolerance = 1e-6)
+})
+
+test_that("rv2coe circular equatorial (TESTASTF, near-circular inputs)", {
+  # true longitude = longitude of periapsis + true anomaly
+  # `s1` (prograde, i = 0°)
+  s1 <- rv2coe(
+    r = c(6199.6905946, 13295.2793851, 0),
+    v = c(-4.7242592, 2.2029583, 0)
+  )
+  expect_equal(s1$p, 14669.71769998, tolerance = 1e-6)
+  expect_equal(s1$ecc, 0, tolerance = 1e-7)
+  expect_equal(unname(s1$incl), 0)
+  expect_equal(((s1$lonper + s1$nu) %% (2 * pi)) / deg, 65, tolerance = 1e-5)
+
+  # `s2` (retrograde, i = 180°)
+  s2 <- rv2coe(
+    r = c(6199.6905946, -13295.2793851, 0),
+    v = c(-4.7242592, -2.2029583, 0)
+  )
+  expect_equal(s2$p, 14669.71769998, tolerance = 1e-6)
+  expect_equal(s2$ecc, 0, tolerance = 1e-7)
+  expect_equal(unname(s2$incl) / deg, 180)
+  expect_equal(((s2$lonper + s2$nu) %% (2 * pi)) / deg, 65, tolerance = 1e-5)
+})
+
+test_that("rv2coe round trip: circular inclined", {
+  for (el in list(c(50, 80, 45), c(150, 115, 315))) {
+    sv <- coe2rv(
+      p = 8291.6435,
+      ecc = 0,
+      incl = el[1] * deg,
+      raan = el[2] * deg,
+      argp = 0,
+      nu = 0,
+      arglat = el[3] * deg
+    )
+    s <- rv2coe(sv$r, sv$v)
+    expect_equal(s$orbit_type, "circular_inclined")
+    expect_equal(s$p, 8291.6435)
+    expect_equal(unname(s$incl) / deg, el[1])
+    expect_equal(unname(s$raan) / deg, el[2])
+    expect_equal(unname(s$arglat) / deg, el[3])
+    expect_true(is.na(s$nu))
+    expect_true(is.na(s$m))
+  }
+})
+
+test_that("rv2coe round trip: circular equatorial", {
+  for (incl in c(0, pi)) {
+    sv <- coe2rv(
+      p = 14669.7177,
+      ecc = 0,
+      incl = incl,
+      raan = 0,
+      argp = 0,
+      nu = 0,
+      truelon = 65 * deg
+    )
+    s <- rv2coe(sv$r, sv$v)
+    expect_equal(s$orbit_type, "circular_equatorial")
+    expect_equal(s$p, 14669.7177)
+    expect_equal(unname(s$incl), incl)
+    expect_equal(unname(s$truelon) / deg, 65)
+    expect_true(is.na(s$raan))
+    expect_true(is.na(s$nu))
+  }
+})
+
+# Hyperbolic and parabolic orbits -------------------------------------------
+# test_kepler.py has no orbital-element references, so these use the
+# (ecc, m, nu) triples from test_newton.py::test_newtonm in
+# https://github.com/CelesTrak/fundamentals-of-astrodynamics/
+# For ecc >= 1, m is Vallado's hyperbolic/parabolic mean-anomaly analogue.
+
+test_that("newtonnu hyperbolic and parabolic (test_newtonm inverse)", {
+  expect_equal(newtonnu(1.5, 1.8916928725677562)$m, pi / 2)
+  expect_equal(newtonnu(1.5, 1.8916928725677562)$e0, 1.449742150875263)
+  expect_equal(newtonnu(1, 1.1949025292471007)$m, pi / 4)
+  expect_equal(newtonnu(1, 1.1949025292471007)$e0, 0.6804016596037228)
+})
+
+test_that("rv2coe hyperbolic inclined via coe2rv (test_newtonm values)", {
+  p <- 20000
+  ecc <- 1.5
+  nu <- 1.8916928725677562
+  incl <- 30 * deg
+  raan <- 40 * deg
+  argp <- 50 * deg
+
+  sv <- coe2rv(
+    p = p,
+    ecc = ecc,
+    incl = incl,
+    raan = raan,
+    argp = argp,
+    nu = nu
+  )
+  s <- rv2coe(sv$r, sv$v)
+
+  expect_equal(s$orbit_type, "eph_inclined")
+  expect_equal(s$p, p)
+  expect_equal(s$ecc, ecc)
+  expect_equal(s$a, p / (1 - ecc^2))
+  expect_lt(s$a, 0)
+  expect_equal(unname(s$incl), incl)
+  expect_equal(unname(s$raan), raan)
+  expect_equal(unname(s$argp), argp)
+  expect_equal(unname(s$nu), nu)
+  expect_equal(s$m, pi / 2)
+})
+
+test_that("rv2coe parabolic inclined via coe2rv (test_newtonm values)", {
+  p <- 20000
+  nu <- 1.1949025292471007
+  ecc <- 1
+  incl <- 30 * deg
+  raan <- 40 * deg
+  argp <- 50 * deg
+
+  sv <- coe2rv(
+    p = p,
+    ecc = ecc,
+    incl = incl,
+    raan = raan,
+    argp = argp,
+    nu = nu
+  )
+  s <- rv2coe(sv$r, sv$v)
+
+  expect_equal(s$orbit_type, "eph_inclined")
+  expect_equal(s$p, p)
+  expect_equal(s$ecc, ecc)
+  # specific energy is ~0 but rounds to slightly nonzero, so |a| is huge
+  expect_gt(abs(s$a), 1e9)
+  expect_equal(unname(s$incl), incl)
+  expect_equal(unname(s$raan), raan)
+  expect_equal(unname(s$argp), argp)
+  expect_equal(unname(s$nu), nu)
+  expect_equal(s$m, pi / 4)
+})
+
+test_that("rv2coe hyperbolic equatorial via coe2rv", {
+  ecc <- 1.5
+  nu <- 1.8916928725677562
+  lonper <- 70
+  sv <- coe2rv(
+    p = 20000,
+    ecc = ecc,
+    incl = 0,
+    raan = 0,
+    argp = 0,
+    nu = nu,
+    lonper = 70 * deg
+  )
+  s <- rv2coe(sv$r, sv$v)
+
+  expect_equal(s$orbit_type, "eph_equatorial")
+  expect_equal(s$ecc, ecc)
+  expect_equal(unname(s$lonper) / deg, lonper)
+  expect_equal(unname(s$nu), nu)
+  expect_equal(s$m, pi / 2)
+})
+
+test_that("newtonnu hyperbolic (test_newtone case, corrected sign)", {
+  # Upstream test_newtone expects nu = -2.7523; its newtone() drops the
+  # minus sign on sin(nu) (Vallado Alg. 6), so the correct nu is positive.
+  res <- newtonnu(1.05, 2.752304611108218)
+  expect_equal(res$e0, 123.45 * pi / 180)
+  expect_equal(res$m, 2.3123894903995055)
 })

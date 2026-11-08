@@ -47,13 +47,13 @@ coe2rv <- function(
   arglat = 0.0, # rad
   truelon = 0.0, # rad
   lonper = 0.0, # rad
-  mu = gravitational_constant_earth # km^3/s^2
+  mu = GRAVITATIONAL_CONSTANT_EARTH # km^3/s^2
 ) {
   # determine what type of orbit is involved and set up the
   # angles for the special cases.
-  if (ecc < small) {
+  if (ecc < SMALL) {
     # circular
-    if ((incl < small) || (abs(incl - pi) < small)) {
+    if ((incl < SMALL) || (abs(incl - pi) < SMALL)) {
       # circular equatorial
       argp <- 0.0
       raan <- 0.0
@@ -65,7 +65,7 @@ coe2rv <- function(
     }
   } else {
     # elliptical equatorial
-    if ((incl < small) || (abs(incl - pi) < small)) {
+    if ((incl < SMALL) || (abs(incl - pi) < SMALL)) {
       argp <- lonper
       raan <- 0.0
     }
@@ -135,7 +135,7 @@ coe2rv <- function(
 #' v = c(4.901327, 5.533756, -1.976341)
 #' rv2coe(r = r, v = v)
 #' }
-rv2coe <- function(r, v, mu = gravitational_constant_earth) {
+rv2coe <- function(r, v, mu = GRAVITATIONAL_CONSTANT_EARTH) {
   # Initialize variables
   # p, a, ecc, incl, raan, argp, nu, m, arglat, truelon, lonper = (np.nan,) * 11
   p <- NA_real_
@@ -195,7 +195,7 @@ rv2coe <- function(r, v, mu = gravitational_constant_earth) {
   # sme = (v_mag**2 / 2) - (mu / r_mag)
   sme <- (v_mag^2 / 2) - (mu / r_mag)
   # a = -mu / (2 * sme) if abs(sme) > const.SMALL else np.inf
-  if (abs(sme) > small) {
+  if (abs(sme) > SMALL) {
     a <- -mu / (2 * sme)
   } else {
     a <- Inf
@@ -209,13 +209,13 @@ rv2coe <- function(r, v, mu = gravitational_constant_earth) {
   incl <- acos(h[3] / h_mag)
   # Determine orbit type
   # orbit_type = utils.determine_orbit_type(ecc, incl, tol=const.SMALL)
-  orbit_type <- determine_orbit_type(ecc, incl, tol = small)
+  orbit_type <- determine_orbit_type(ecc, incl, tol = SMALL)
   # Find right ascension of ascending node
   # if n_mag > const.SMALL:
   #     raan = np.arccos(np.clip(n_vec[0] / n_mag, -1, 1))
   #     if n_vec[1] < 0:
   #         raan = adjust_angle(raan)
-  if (n_mag > small) {
+  if (n_mag > SMALL) {
     raan <- acos(clip(n_vec[1] / n_mag, -1, 1))
     if (n_vec[2] < 0) {
       raan <- adjust_angle(raan)
@@ -261,7 +261,7 @@ rv2coe <- function(r, v, mu = gravitational_constant_earth) {
   #         lonper = adjust_angle(lonper)
   #     if incl > np.pi / 2:
   #         lonper = adjust_angle(lonper)
-  if (ecc > small && orbit_type == "eph_equatorial") {
+  if (ecc > SMALL && orbit_type == "eph_equatorial") {
     lonper <- acos(clip(e_vec[1] / ecc, -1, 1))
     if (e_vec[2] < 0) {
       lonper <- adjust_angle(lonper)
@@ -277,7 +277,7 @@ rv2coe <- function(r, v, mu = gravitational_constant_earth) {
   #         truelon = adjust_angle(truelon)
   #     if incl > np.pi / 2:
   #         truelon = adjust_angle(truelon)
-  if (r_mag > small && orbit_type == "circular_equatorial") {
+  if (r_mag > SMALL && orbit_type == "circular_equatorial") {
     truelon <- acos(clip(r[1] / r_mag, -1, 1))
     if (r[2] < 0) {
       truelon <- adjust_angle(truelon)
@@ -410,7 +410,7 @@ mag <- function(x) {
 #' res <- ecef2ll(r)
 #' }
 ecef2ll <- function(r) {
-  small <- 1e-8 # small value for tolerances
+  SMALL <- 1e-8 # SMALL value for tolerances
   re <- 6378.1363 # km
   eesqrd <- 0.006694385000 # eccentricity of earth sqrd
 
@@ -419,7 +419,7 @@ ecef2ll <- function(r) {
   # find the longitude value
   names(r) <- NULL
   temp <- sqrt(r[1] * r[1] + r[2] * r[2])
-  if (abs(temp) < small) {
+  if (abs(temp) < SMALL) {
     rtasc <- sign(r[3]) * pi * 0.5
   } else {
     rtasc <- atan2(r[2], r[1])
@@ -442,7 +442,7 @@ ecef2ll <- function(r) {
   i <- 1
   olddelta <- latgd + 10.0
 
-  while ((abs(olddelta - latgd) >= small) && (i < 10)) {
+  while ((abs(olddelta - latgd) >= SMALL) && (i < 10)) {
     olddelta <- latgd
     sintemp <- sin(latgd)
     c <- re / (sqrt(1.0 - eesqrd * sintemp * sintemp))
@@ -488,8 +488,7 @@ ecef2ll <- function(r) {
 #'   i = 6524.834,
 #'   j = 6862.875,
 #'   k = 6448.296
-#' ) |>
-#'   units::set_units("km")
+#' ) # km
 #'
 #' res <- ecef2llb(r)
 #' }
@@ -501,12 +500,12 @@ ecef2llb <- function(r) {
   magr <- r |> as.matrix() |> norm("F") # km
 
   # Earth semi-major and semi-minor axes
-  a <- mean_equatorial_radius_earth
-  b <- sign(r[3]) * a * sqrt(1.0 - squared_eccentricity_earth)
+  a <- MEAN_EQUATORIAL_RADIUS_EARTH # km
+  b <- sign(r[3]) * a * sqrt(1.0 - SQUARED_ECCENTRICITY_EARTH)
   # Compute longitude (right ascension approximation)
   names(r) <- NULL
   temp <- sqrt(r[1] * r[1] + r[2] * r[2])
-  if (abs(temp) < small) {
+  if (abs(temp) < SMALL) {
     lon <- sign(r[3]) * pi * 0.5
   } else {
     lon <- atan2(r[2], r[1])
@@ -559,14 +558,14 @@ interval_modulus <- function(x, a, b) {
 #'
 #' @param ecc the eccentricity of the orbit
 #' @param incl the inclination of the orbit [rad]
-#' @param tol small value for tolerance
+#' @param tol SMALL value for tolerance
 #'
 #' @returns a type of orbit such as
 #'          - "circular_equatorial"
 #'          - "circular_inclined"
 #'          - "eph_equatorial" (elliptical, parabolic, hyperbolic equatorial)
 #'          - "eph_inclined" (elliptical, parabolic, hyperbolic inclined)
-determine_orbit_type <- function(ecc, incl, tol = small) {
+determine_orbit_type <- function(ecc, incl, tol = SMALL) {
   if (ecc < tol) {
     if ((incl < tol) || (abs(incl - pi) < tol)) {
       return("circular_equatorial")
@@ -619,7 +618,7 @@ angle <- function(v1, v2) {
   #      return np.arccos(cos_angle)
   #  else:
   #      return np.nan
-  if (mag_v1 * mag_v2 > small^2) {
+  if (mag_v1 * mag_v2 > SMALL^2) {
     cos_angle <- pracma::dot(v1, v2) / (mag_v1 * mag_v2)
     # keep cosine within domain
     cos_angle <- clip(cos_angle, -1, 1)
@@ -664,17 +663,17 @@ newtonnu <- function(ecc, nu, parabolic_lim_deg = 168) {
   e0 <- Inf
   m <- Inf
 
-  if (abs(ecc) < small) {
+  if (abs(ecc) < SMALL) {
     # Circular case
     e0 <- nu
     m <- nu
-  } else if (ecc < (1 - small)) {
+  } else if (ecc < (1 - SMALL)) {
     # Elliptical case
     sine <- (sqrt(1 - ecc^2) * sin(nu)) / (1 + ecc * cos(nu))
     cose <- (ecc + cos(nu)) / (1 + ecc * cos(nu))
     e0 <- atan2(sine, cose)
     m <- e0 - ecc * sin(e0)
-  } else if (ecc > (1 + small)) {
+  } else if (ecc > (1 + SMALL)) {
     # Hyperbolic case
     if ((ecc > 1) && (abs(nu) < (pi - acos(1 / ecc)))) {
       sine <- (sqrt(ecc^2 - 1) * sin(nu)) / (1 + ecc * cos(nu))
