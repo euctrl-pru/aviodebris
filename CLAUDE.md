@@ -18,6 +18,8 @@ The package combines:
 aviodebris/
 ├── R/                          # Package source code
 │   ├── orbitals.R              # Kepler-to-Cartesian conversion, latitude weights
+│   ├── vallado.R               # Ports of Vallado astrodynamics algorithms (coe2rv, rv2coe, ecef2ll, ...)
+│   ├── constants.R             # Internal astrodynamic constants (EGM-08, km/s/rad units)
 │   ├── hex_spatial.R           # H3 hexagon grid operations, bounding box utilities
 │   ├── hexagonize.R            # Assign H3 cells to trajectory points (DuckDB)
 │   ├── resample.R              # Trajectory resampling
@@ -31,7 +33,9 @@ aviodebris/
 │   ├── gcat.R                  # Process GCAT debris reentry catalog
 │   ├── weighting_function.R    # Generate probability weights
 │   └── gcat/                   # Raw GCAT TSV files
-├── tests/testthat/             # Unit tests (testthat)
+├── tests/testthat/             # Unit tests (testthat, edition 3)
+│   ├── test-orbitals.R         # kepler_to_cartesian(), latitude_weights()
+│   └── test-vallado.R          # Vallado ports against published reference values
 └── man/                        # Auto-generated roxygen2 documentation
 ```
 
@@ -48,6 +52,27 @@ aviodebris/
 | `traffic_density_hourly()` | Calculate hourly traffic density per cell/aircraft type |
 | `collision_and_casualty_risk_expectation_hourly()` | Compute risk expectation combining debris weights and traffic |
 | `scrape_aircraft_type_info_*()` | Scrape aircraft data from EUROCONTROL, Skybrary, doc8643 |
+| `coe2rv()` | Classical orbital elements → ECI position/velocity (Vallado) |
+| `rv2coe()` | ECI position/velocity → classical orbital elements and orbit type (Vallado) |
+| `ecef2ll()` / `ecef2llb()` | ECEF position → geocentric/geodetic latitude, longitude, height (Astronomical Almanac / Borkowski) |
+
+### Vallado ports (`R/vallado.R`)
+
+Ports of algorithms from D. Vallado, *Fundamentals of Astrodynamics and Applications* (2022), following the CelesTrak Python implementation (https://github.com/CelesTrak/fundamentals-of-astrodynamics, `software/python/src/valladopy/`).
+
+- Plain numerics in **km, km/s, rad** (no `units` objects); `mu` defaults to `GRAVITATIONAL_CONSTANT_EARTH` (398600.4415 km³/s²).
+- Orbit types (from `determine_orbit_type()`): `"circular_equatorial"`, `"circular_inclined"`, `"eph_equatorial"`, `"eph_inclined"` ("eph" = elliptical, parabolic or hyperbolic). Orbit-type tolerance is `SMALL = 1e-10` (Python port); Vallado's Fortran uses 1e-8.
+- Undefined elements are `NA` (e.g. `nu`/`m` for circular, `raan`/`argp` for equatorial orbits). For circular orbits `coe2rv()` needs `arglat` (inclined) or `truelon` (equatorial) instead of `nu`.
+- Internal helpers: `rot1()`, `rot3()`, `newtonnu()`, `determine_orbit_type()`, `angle()`, `clip()`, `adjust_angle()`, `interval_modulus()`; `fmod()`/`rebound()` adapted from StratigrapheR.
+- Known upstream bug: the Python `newtone()` drops the minus sign on sin(ν) in the hyperbolic branch (Vallado Alg. 6), so its `test_newtone` hyperbolic expected ν has the wrong sign. Don't port it literally.
+
+### Test reference values (`tests/testthat/test-vallado.R`)
+
+| Source | Covers |
+|---|---|
+| CelesTrak Python tests (`test_frame_conversions.py`, `test_newton.py`) | Ex. 2-5/2-6/5-5 (`rv2coe`/`coe2rv`, heliocentric `mu`), Ex. 3-3 (`ecef2ll`, `ecef2llb`), `newtonnu` |
+| Vallado Fortran `software/fortran/TESTASTF.OUT` (ELORB cases) | Elliptical inclined/equatorial (prograde + retrograde); near-circular vectors (printed to 7 decimals, so compared at 1e-6 and give ecc ≈ 1e-8) |
+| `coe2rv()` → `rv2coe()` round trips | Exact circular inclined/equatorial types; hyperbolic and parabolic orbits with anomalies from `test_newtonm` |
 
 ## Datasets
 
@@ -98,6 +123,9 @@ This package follows tidyverse style conventions:
 - Prefix external package functions with namespace (e.g., `dplyr::filter()`)
 - Use the `.data` pronoun in data-masking contexts (`filter()`, `mutate()`, `summarise()`, ...) for R CMD check compliance
 - In tidyselect contexts (`select()`, `unnest()`, `pivot_*()`, `.by`, ...) use quoted column names (e.g. `select(-"x")`), not `.data$x` (deprecated since tidyselect 1.2.0)
+- In roxygen, escape unit brackets (`\[km\]`, `\[rad\]`), otherwise markdown turns them into broken links
+- Tests use testthat edition 3: `tolerance` is a mean *relative* difference; use explicit absolute bounds (`expect_lt(max(abs(x - y)), eps)`) when values are tiny or near zero
+- Call `coe2rv()` / `rv2coe()` with named arguments in tests
 
 ## Dependencies
 
@@ -107,6 +135,8 @@ Key dependencies:
 - **h3jsr**: H3 hexagonal grid operations
 - **sf**: Spatial features
 - **trrrj**: Trajectory resampling (custom package)
+- **pracma** (removed): row-wise `row_dot()`/`row_norm()`/`row_cross()` helpers in `R/vallado.R` replace it
+- **units** (Suggests): only used in tests
 
 ## Known Issues and TODOs
 
@@ -115,6 +145,13 @@ Key dependencies:
 - ~~`hexagonize.R`: Hardcoded extension path `/Users/spi/.duckdb/extensions`~~ ✓ Fixed (uses `DUCKDB_EXTENSION_DIR` env var)
 - ~~`hexagonize.R`: DuckDB connection not closed (should use `withr::local_db_connection()`)~~ ✓ Fixed
 - ~~`hexagonize.R`: Parameter `day` is shadowed by `lubridate::day(date)` assignment~~ ✓ Fixed (renamed to `day_of_month`)
+
+- ~~`rv2coe()`: orbit-type names mismatched `determine_orbit_type()` (`cir_*` vs `circular_*`), so circular elements were never computed~~ ✓ Fixed
+
+### Vallado TODOs
+- No independent reference values for hyperbolic/parabolic `rv2coe()` (only round trips + `test_newtonm` anomalies)
+- Untested edge cases: hyperbolic ν beyond asymptote (`m = Inf`), parabolic ν > 168°, ecc between 1e-10 and 1e-8
+- `h_mag < 0` early return in `rv2coe()` is unreachable (a norm can't be negative)
 
 ### Style Improvements
 - ~~Replace `group_by() |> summarise() |> ungroup()` with `.by` argument~~ ✓ Finished
