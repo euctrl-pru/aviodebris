@@ -7,14 +7,15 @@
 rv2coe(r, v, mu = GRAVITATIONAL_CONSTANT_EARTH)
 }
 \arguments{
-\item{r}{Position vector [km]}
+\item{r}{Position vector [km]: a 3-vector, or an n x 3 matrix (one per row)}
 
-\item{v}{Velocity vector [km/s]}
+\item{v}{Velocity vector [km/s]: same shape as \code{r}}
 
 \item{mu}{gravitational parameter, default to Earth's, [km^3/s^2]}
 }
 \value{
-a list of named items, (\code{p}, \code{a}, \code{ecc}, \code{incl}, \code{raan}, \code{argp},
+a list of named length-n vectors (n = number of state vectors),
+(\code{p}, \code{a}, \code{ecc}, \code{incl}, \code{raan}, \code{argp},
 \code{nu}, \code{m}, \code{arglat}, \code{truelon}, \code{lonper}, \code{orbit_type}), where
 * \code{p}  = semilatus rectum [km]
 * \code{a} = semimajor axis [km]

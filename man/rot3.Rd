@@ -7,12 +7,12 @@
 rot3(vec, theta)
 }
 \arguments{
-\item{vec}{a 3D vector to rotate}
+\item{vec}{a 3D vector, or an n x 3 matrix with one vector per row}
 
-\item{theta}{the angle of rotation [rad]}
+\item{theta}{the angle of rotation [rad], length 1 or n}
 }
 \value{
-a 3D vector
+an n x 3 matrix of rotated vectors (one row per input vector)
 }
 \description{
 Rotate a vector about the 3rd axis

@@ -44,8 +44,10 @@ the ascending node, \verb{\eqn{\Omega}}}
 \item{mu}{gravitational parameter, default to Earth's, [km^3/s^2]}
 }
 \value{
-a list of 2 vectors, \code{r} [km] and \code{v} [km/s] with named components
-\code{i}, \code{j}, and \code{k}, and \code{vi}, \code{vj} and \code{vk} respectively.
+a list with \code{r} [km] and \code{v} [km/s]. For a single orbit these are
+named vectors (\code{i}, \code{j}, \code{k} and \code{vi}, \code{vj}, \code{vk}); when any element has
+length n > 1 they are n x 3 matrices with those column names.
+All elements are recycled to a common length (1 or n).
 }
 \description{
 The additional orbital elements provide calculations for perfectly circular

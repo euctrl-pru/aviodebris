@@ -7,7 +7,7 @@
 newtonnu(ecc, nu, parabolic_lim_deg = 168)
 }
 \arguments{
-\item{ecc}{eccentricity of the orbit}
+\item{ecc}{eccentricity of the orbit (vectorised with \code{nu})}
 
 \item{nu}{true anomaly [rad]}
 

@@ -22,8 +22,10 @@
 #'               \eqn{[0, 2\pi]} \[rad\]
 #' @param mu gravitational parameter, default to Earth's, \[km^3/s^2\]
 #'
-#' @returns a list of 2 vectors, `r` \[km\] and `v` \[km/s\] with named components
-#'          `i`, `j`, and `k`, and `vi`, `vj` and `vk` respectively.
+#' @returns a list with `r` \[km\] and `v` \[km/s\]. For a single orbit these are
+#'          named vectors (`i`, `j`, `k` and `vi`, `vj`, `vk`); when any element has
+#'          length n > 1 they are n x 3 matrices with those column names.
+#'          All elements are recycled to a common length (1 or n).
 #' @export
 #'
 #' @examples
@@ -49,65 +51,82 @@ coe2rv <- function(
   lonper = 0.0, # rad
   mu = GRAVITATIONAL_CONSTANT_EARTH # km^3/s^2
 ) {
-  # determine what type of orbit is involved and set up the
-  # angles for the special cases.
-  if (ecc < SMALL) {
-    # circular
-    if ((incl < SMALL) || (abs(incl - pi) < SMALL)) {
-      # circular equatorial
-      argp <- 0.0
-      raan <- 0.0
-      nu <- truelon
-    } else {
-      # circular inclined
-      argp <- 0.0
-      nu <- arglat
-    }
-  } else {
-    # elliptical equatorial
-    if ((incl < SMALL) || (abs(incl - pi) < SMALL)) {
-      argp <- lonper
-      raan <- 0.0
-    }
+  # recycle all element inputs to a common length (length 1 or n)
+  els <- list(
+    p = p,
+    ecc = ecc,
+    incl = incl,
+    raan = raan,
+    argp = argp,
+    nu = nu,
+    arglat = arglat,
+    truelon = truelon,
+    lonper = lonper
+  )
+  lens <- lengths(els)
+  n <- max(lens)
+  if (any(!lens %in% c(1L, n))) {
+    cli::cli_abort(
+      "Orbital elements must have length 1 or a common length {n}."
+    )
   }
+  els <- lapply(els, rep_len, length.out = n)
+
+  # determine what type of orbit is involved and set up the
+  # angles for the special cases, element-wise.
+  circ <- els$ecc < SMALL
+  equat <- (els$incl < SMALL) | (abs(els$incl - pi) < SMALL)
+
+  # circular equatorial: nu <- truelon; circular inclined: nu <- arglat
+  nu <- ifelse(circ & equat, els$truelon, ifelse(circ, els$arglat, els$nu))
+  # circular: argp <- 0; elliptical equatorial: argp <- lonper
+  argp <- ifelse(circ, 0.0, ifelse(equat, els$lonper, els$argp))
+  # equatorial (circular or not): raan <- 0
+  raan <- ifelse(equat, 0.0, els$raan)
+  incl <- els$incl
+  ecc <- els$ecc
+  p <- els$p
+
   # Compute position and velocity in the perifocal coordinate system (PQW)
   cosnu <- cos(nu)
   sinnu <- sin(nu)
 
   temp <- p / (1.0 + (ecc * cosnu))
-  r_pqw <- temp * c(cosnu, sinnu, 0.0)
+  r_pqw <- cbind(temp * cosnu, temp * sinnu, 0.0)
 
-  if (abs(p) < 0.0001) {
-    p <- 0.0001
-  }
-
-  v_pqw <- sqrt(mu / p) * c(-sinnu, (ecc + cosnu), 0.0)
+  p <- ifelse(abs(p) < 0.0001, 0.0001, p)
+  vf <- sqrt(mu / p)
+  v_pqw <- cbind(-vf * sinnu, vf * (ecc + cosnu), 0.0)
 
   # transform to IJK
-  r_ijk <- rot3(r_pqw, -argp) |>
-    rot1(-incl) |>
-    rot3(-raan) |>
-    `names<-`(c("i", "j", "k"))
+  to_ijk <- function(m) {
+    m |>
+      rot3(-argp) |>
+      rot1(-incl) |>
+      rot3(-raan)
+  }
+  r_ijk <- to_ijk(r_pqw)
+  v_ijk <- to_ijk(v_pqw)
+  colnames(r_ijk) <- c("i", "j", "k")
+  colnames(v_ijk) <- c("vi", "vj", "vk")
 
-  v_ijk <- rot3(v_pqw, -argp) |>
-    rot1(-incl) |>
-    rot3(-raan) |>
-    `names<-`(c("vi", "vj", "vk"))
-
-  return(
-    list(r = r_ijk, v = v_ijk)
-  )
+  # a single orbit keeps the named-vector return
+  if (n == 1L) {
+    return(list(r = r_ijk[1, ], v = v_ijk[1, ]))
+  }
+  list(r = r_ijk, v = v_ijk)
 }
 
 #' Converts position and velocity vectors into classical orbital elements.
 #'
 #' From Vallado, Algorithm 9
 #'
-#' @param r Position vector \[km\]
-#' @param v Velocity vector \[km/s\]
+#' @param r Position vector \[km\]: a 3-vector, or an n x 3 matrix (one per row)
+#' @param v Velocity vector \[km/s\]: same shape as `r`
 #' @param mu gravitational parameter, default to Earth's, \[km^3/s^2\]
 #'
-#' @returns a list of named items, (`p`, `a`, `ecc`, `incl`, `raan`, `argp`,
+#' @returns a list of named length-n vectors (n = number of state vectors),
+#'          (`p`, `a`, `ecc`, `incl`, `raan`, `argp`,
 #'          `nu`, `m`, `arglat`, `truelon`, `lonper`, `orbit_type`), where
 #'          * `p`  = semilatus rectum \[km\]
 #'          * `a` = semimajor axis \[km\]
@@ -136,165 +155,79 @@ coe2rv <- function(
 #' rv2coe(r = r, v = v)
 #' }
 rv2coe <- function(r, v, mu = GRAVITATIONAL_CONSTANT_EARTH) {
-  # Initialize variables
-  # p, a, ecc, incl, raan, argp, nu, m, arglat, truelon, lonper = (np.nan,) * 11
-  p <- NA_real_
-  a <- NA_real_
-  ecc <- NA_real_
-  incl <- NA_real_
-  raan <- NA_real_
-  argp <- NA_real_
-  nu <- NA_real_
-  m <- NA_real_
-  arglat <- NA_real_
-  truelon <- NA_real_
-  lonper <- NA_real_
-  # orbit_type = None
-  orbit_type <- NA_character_
-  # Make sure position and velocity vectors are numpy arrays
-  # r, v = np.array(r), np.array(v)
-  # Get magnitude of position and velocity vectors
-  # r_mag, v_mag = np.linalg.norm(r), np.linalg.norm(v)
-  r_mag <- r |> as.matrix() |> norm("F")
-  v_mag <- v |> as.matrix() |> norm("F")
-  # # Get angular momentum
-  # h = np.cross(r, v)
-  h <- pracma::cross(r, v)
-  # h_mag = np.linalg.norm(h)
-  h_mag <- h |> as.matrix() |> norm("F")
-  # Elements are undefined for negative angular momentum
-  # if h_mag < 0:
-  #     return p, a, ecc, incl, raan, argp, nu, m, arglat, truelon, lonper, orbit_type
-  if (h_mag < 0) {
-    return(list(
-      p = p,
-      a = a,
-      ecc = ecc,
-      incl = incl,
-      raan = raan,
-      argp = argp,
-      nu = nu,
-      m = m,
-      arglat = arglat,
-      truelon = truelon,
-      lonper = lonper,
-      orbit_type = orbit_type
-    ))
-  }
-  # Define line of nodes vector
-  # n_vec = np.array([-h[1], h[0], 0])
-  n_vec <- c(-h[2], h[1], 0.0)
-  # n_mag = np.linalg.norm(n_vec)
-  n_mag <- n_vec |> as.matrix() |> norm("F")
-  # Get eccentricity vector
-  # e_vec = ((v_mag**2 - mu / r_mag) * r - np.dot(r, v) * v) / mu
-  e_vec <- ((v_mag^2 - mu / r_mag) * r - pracma::dot(r, v) * v) / mu
-  # ecc = np.linalg.norm(e_vec)
-  ecc <- e_vec |> as.matrix() |> norm("F")
-  # find a, e, and p (semi-latus rectum)
-  # sme = (v_mag**2 / 2) - (mu / r_mag)
-  sme <- (v_mag^2 / 2) - (mu / r_mag)
-  # a = -mu / (2 * sme) if abs(sme) > const.SMALL else np.inf
-  if (abs(sme) > SMALL) {
-    a <- -mu / (2 * sme)
-  } else {
-    a <- Inf
+  # one state vector per row; a plain 3-vector becomes a single row
+  r <- matrix(r, ncol = 3)
+  v <- matrix(v, ncol = 3)
+  if (nrow(r) != nrow(v)) {
+    cli::cli_abort("{.arg r} and {.arg v} must have the same number of rows.")
   }
 
-  # Semi-latus rectum
-  # p = h_mag**2 / mu
+  r_mag <- row_norm(r)
+  v_mag <- row_norm(v)
+  rdotv <- row_dot(r, v)
+
+  # angular momentum and line of nodes
+  h <- row_cross(r, v)
+  h_mag <- row_norm(h)
+  n_vec <- cbind(-h[, 2], h[, 1], 0.0)
+  n_mag <- row_norm(n_vec)
+
+  # eccentricity vector
+  e_vec <- ((v_mag^2 - mu / r_mag) * r - rdotv * v) / mu
+  ecc <- row_norm(e_vec)
+
+  # semimajor axis (Inf for parabolic) and semilatus rectum
+  sme <- (v_mag^2 / 2) - (mu / r_mag)
+  a <- ifelse(abs(sme) > SMALL, -mu / (2 * sme), Inf)
   p <- h_mag^2 / mu
-  # Find inclination
-  # incl = np.arccos(h[2] / h_mag)
-  incl <- acos(h[3] / h_mag)
-  # Determine orbit type
-  # orbit_type = utils.determine_orbit_type(ecc, incl, tol=const.SMALL)
+
+  incl <- acos(h[, 3] / h_mag)
   orbit_type <- determine_orbit_type(ecc, incl, tol = SMALL)
-  # Find right ascension of ascending node
-  # if n_mag > const.SMALL:
-  #     raan = np.arccos(np.clip(n_vec[0] / n_mag, -1, 1))
-  #     if n_vec[1] < 0:
-  #         raan = adjust_angle(raan)
-  if (n_mag > SMALL) {
-    raan <- acos(clip(n_vec[1] / n_mag, -1, 1))
-    if (n_vec[2] < 0) {
-      raan <- adjust_angle(raan)
-    }
-  }
-  # Find argument of periapsis
-  # if orbit_type is utils.OrbitType.EPH_INCLINED:
-  #     argp = angle(n_vec, e_vec)
-  #     if e_vec[2] < 0:
-  #         argp = adjust_angle(argp)
-  if (orbit_type == "eph_inclined") {
-    argp <- angle(n_vec, e_vec)
-    if (e_vec[3] < 0) {
-      argp <- adjust_angle(argp)
-    }
-  }
-  # Find true anomaly at epoch
-  # if orbit_type in [utils.OrbitType.EPH_INCLINED, utils.OrbitType.EPH_EQUATORIAL]:
-  #     nu = angle(e_vec, r)
-  #     if np.dot(r, v) < 0:
-  #         nu = adjust_angle(nu)
-  if (orbit_type %in% c("eph_inclined", "eph_equatorial")) {
-    nu <- angle(e_vec, r)
-    if (pracma::dot(r, v) < 0) {
-      nu <- adjust_angle(nu)
-    }
-  }
-  # Find argument of latitude (inclined cases)
-  # if orbit_type in [utils.OrbitType.CIR_INCLINED, utils.OrbitType.EPH_INCLINED]:
-  #     arglat = angle(n_vec, r)
-  #     if r[2] < 0:
-  #         arglat = adjust_angle(arglat)
-  if (orbit_type %in% c("circular_inclined", "eph_inclined")) {
-    arglat <- angle(n_vec, r)
-    if (r[3] < 0) {
-      arglat <- adjust_angle(arglat)
-    }
-  }
-  # Find longitude of periapsis
-  # if ecc > const.SMALL and orbit_type is utils.OrbitType.EPH_EQUATORIAL:
-  #     lonper = np.arccos(np.clip(e_vec[0] / ecc, -1, 1))
-  #     if e_vec[1] < 0:
-  #         lonper = adjust_angle(lonper)
-  #     if incl > np.pi / 2:
-  #         lonper = adjust_angle(lonper)
-  if (ecc > SMALL && orbit_type == "eph_equatorial") {
-    lonper <- acos(clip(e_vec[1] / ecc, -1, 1))
-    if (e_vec[2] < 0) {
-      lonper <- adjust_angle(lonper)
-    }
-    if (incl > (pi / 2)) {
-      lonper <- adjust_angle(lonper)
-    }
-  }
-  # Find true longitude
-  # if r_mag > const.SMALL and orbit_type is utils.OrbitType.CIR_EQUATORIAL:
-  #     truelon = np.arccos(np.clip(r[0] / r_mag, -1, 1))
-  #     if r[1] < 0:
-  #         truelon = adjust_angle(truelon)
-  #     if incl > np.pi / 2:
-  #         truelon = adjust_angle(truelon)
-  if (r_mag > SMALL && orbit_type == "circular_equatorial") {
-    truelon <- acos(clip(r[1] / r_mag, -1, 1))
-    if (r[2] < 0) {
-      truelon <- adjust_angle(truelon)
-    }
-    if (incl > (pi / 2)) {
-      truelon <- adjust_angle(truelon)
-    }
-  }
-  # Find mean anomaly for eccentric orbits
-  # if np.isreal(ecc):
-  #     _, m = newtonnu(ecc, nu)
-  # nu is undefined (NA) for circular orbits, so m stays NA too
-  if (is.double(ecc) && !is.na(nu)) {
-    m <- newtonnu(ecc, nu) |> magrittr::extract("m") |> as.numeric()
-  }
-  # return p, a, ecc, incl, raan, argp, nu, m, arglat, truelon, lonper, orbit_type
-  return(list(
+  ei <- orbit_type == "eph_inclined"
+  ee <- orbit_type == "eph_equatorial"
+  ci <- orbit_type == "circular_inclined"
+  ce <- orbit_type == "circular_equatorial"
+
+  # quadrant fix: 2 * pi - x where cond holds
+  flip <- function(x, cond) ifelse(cond, adjust_angle(x), x)
+
+  # right ascension of ascending node
+  raan <- ifelse(
+    n_mag > SMALL,
+    flip(acos(clip(n_vec[, 1] / n_mag, -1, 1)), n_vec[, 2] < 0),
+    NA_real_
+  )
+  # argument of periapsis
+  argp <- ifelse(ei, flip(angle(n_vec, e_vec), e_vec[, 3] < 0), NA_real_)
+  # true anomaly
+  nu <- ifelse(ei | ee, flip(angle(e_vec, r), rdotv < 0), NA_real_)
+  # argument of latitude (inclined cases)
+  arglat <- ifelse(ci | ei, flip(angle(n_vec, r), r[, 3] < 0), NA_real_)
+  # longitude of periapsis (eccentric equatorial)
+  lonper <- ifelse(
+    ecc > SMALL & ee,
+    flip(
+      flip(acos(clip(e_vec[, 1] / ecc, -1, 1)), e_vec[, 2] < 0),
+      incl > (pi / 2)
+    ),
+    NA_real_
+  )
+  # true longitude (circular equatorial)
+  truelon <- ifelse(
+    r_mag > SMALL & ce,
+    flip(
+      flip(acos(clip(r[, 1] / r_mag, -1, 1)), r[, 2] < 0),
+      incl > (pi / 2)
+    ),
+    NA_real_
+  )
+
+  # mean anomaly; nu is undefined (NA) for circular orbits, so m stays NA
+  m <- rep(NA_real_, length(nu))
+  has_nu <- !is.na(nu)
+  m[has_nu] <- newtonnu(ecc[has_nu], nu[has_nu])$m
+
+  list(
     p = p,
     a = a,
     ecc = ecc,
@@ -307,75 +240,52 @@ rv2coe <- function(r, v, mu = GRAVITATIONAL_CONSTANT_EARTH) {
     truelon = truelon,
     lonper = lonper,
     orbit_type = orbit_type
-  ))
+  )
 }
 
 
 #' Rotate a vector about the 1st axis
 #'
-#' @param vec a 3D vector to rotate
-#' @param theta the angle of rotation \[rad\]
+#' @param vec a 3D vector, or an n x 3 matrix with one vector per row
+#' @param theta the angle of rotation \[rad\], length 1 or n
 #'
-#' @returns a 3D vector
+#' @returns an n x 3 matrix of rotated vectors (one row per input vector)
 #'
 #' @examples
 #' \dontrun{
 #' c(0, 1, 0) |> rot1(pi/2)
 #' }
 rot1 <- function(vec, theta) {
-  temp <- vec[3]
+  m <- matrix(vec, ncol = 3)
   c <- cos(theta)
   s <- sin(theta)
 
-  outvec_3 <- c * vec[3] - s * vec[2]
-  outvec_2 <- c * vec[2] + s * temp
-  outvec_1 <- vec[1]
-
-  c(outvec_1, outvec_2, outvec_3)
-
-  # matrix(
-  #   # fmt: skip
-  #   c( 1,           0,           0,
-  #      0,  cos(theta),  sin(theta),
-  #      0, -sin(theta),  cos(theta)),
-  #   nrow = 3
-  # ) %*%
-  #   matrix(vec, ncol = 1) |>
-  #   as.vector()
+  cbind(
+    m[, 1],
+    c * m[, 2] + s * m[, 3],
+    c * m[, 3] - s * m[, 2]
+  )
 }
 
 
 #' Rotate a vector about the 3rd axis
 #'
 #' @inherit rot1
-#' @returns a 3D vector
 #'
 #' @examples
 #' \dontrun{
 #' c(0, 1, 0) |> rot3(-pi/2)
 #' }
 rot3 <- function(vec, theta) {
-  temp <- vec[2]
+  m <- matrix(vec, ncol = 3)
   c <- cos(theta)
   s <- sin(theta)
 
-  outvec_2 <- c * vec[2] - s * vec[1]
-  outvec_1 <- c * vec[1] + s * temp
-  outvec_3 <- vec[3]
-
-  c(outvec_1, outvec_2, outvec_3)
-
-  # rotation about a generic axis
-  # https://en.wikipedia.org/wiki/Rotation_matrix#Rotation_matrix_from_axis_and_angle
-  # matrix(
-  #   # fmt: skip
-  #   c( cos(theta),  sin(theta), 0,
-  #     -sin(theta),  cos(theta), 0,
-  #               0,           0, 1),
-  #   nrow = 3
-  # ) %*%
-  #   matrix(vec, ncol = 1) |>
-  #   as.vector()
+  cbind(
+    c * m[, 1] + s * m[, 2],
+    c * m[, 2] - s * m[, 1],
+    m[, 3]
+  )
 }
 
 
@@ -566,17 +476,12 @@ interval_modulus <- function(x, a, b) {
 #'          - "eph_equatorial" (elliptical, parabolic, hyperbolic equatorial)
 #'          - "eph_inclined" (elliptical, parabolic, hyperbolic inclined)
 determine_orbit_type <- function(ecc, incl, tol = SMALL) {
-  if (ecc < tol) {
-    if ((incl < tol) || (abs(incl - pi) < tol)) {
-      return("circular_equatorial")
-    } else {
-      return("circular_inclined")
-    }
-  } else if ((incl < tol) || (abs(incl - pi) < tol)) {
-    return("eph_equatorial")
-  } else {
-    return("eph_inclined")
-  }
+  equat <- (incl < tol) | (abs(incl - pi) < tol)
+  ifelse(
+    ecc < tol,
+    ifelse(equat, "circular_equatorial", "circular_inclined"),
+    ifelse(equat, "eph_equatorial", "eph_inclined")
+  )
 }
 
 # equivalent to numpy clip()
@@ -598,32 +503,40 @@ clip <- function(x, lower, upper) {
 #' magnitude, the function returns `NaN`to indicate that the angle is not
 #' computable.
 #'
-#' @param v1 a vector
-#' @param v2 a vector
+#' @param v1 a 3-vector or an n x 3 matrix
+#' @param v2 a 3-vector or an n x 3 matrix
 #'
-#' @returns the angle between two vectors \[rad\], NaN if either vector is zero
+#' @returns the row-wise angles \[rad\], NaN where either vector is zero
 #'
 #' @noRd
 angle <- function(v1, v2) {
-  #  mag_v1 = np.linalg.norm(v1)
-  mag_v1 <- v1 |> as.matrix() |> norm("F")
-  #  mag_v2 = np.linalg.norm(v2)
-  mag_v2 <- v2 |> as.matrix() |> norm("F")
-  #  if mag_v1 * mag_v2 > SMALL**2:
-  #      cos_angle = np.dot(v1, v2) / (mag_v1 * mag_v2)
-  #      cos_angle = np.clip(cos_angle, -1, 1)  # keep cosine within domain
-  #      return np.arccos(cos_angle)
-  #  else:
-  #      return np.nan
-  if (mag_v1 * mag_v2 > SMALL^2) {
-    cos_angle <- pracma::dot(v1, v2) / (mag_v1 * mag_v2)
-    # keep cosine within domain
-    cos_angle <- clip(cos_angle, -1, 1)
-  } else {
-    cos_angle <- NaN
-  }
-
+  mags <- row_norm(v1) * row_norm(v2)
+  # keep cosine within domain; NaN if either vector is zero
+  cos_angle <- ifelse(
+    mags > SMALL^2,
+    clip(row_dot(v1, v2) / mags, -1, 1),
+    NaN
+  )
   acos(cos_angle)
+}
+
+# row-wise vector helpers: inputs are 3-vectors or n x 3 matrices
+row_dot <- function(a, b) {
+  rowSums(matrix(a, ncol = 3) * matrix(b, ncol = 3))
+}
+
+row_norm <- function(a) {
+  sqrt(row_dot(a, a))
+}
+
+row_cross <- function(a, b) {
+  a <- matrix(a, ncol = 3)
+  b <- matrix(b, ncol = 3)
+  cbind(
+    a[, 2] * b[, 3] - a[, 3] * b[, 2],
+    a[, 3] * b[, 1] - a[, 1] * b[, 3],
+    a[, 1] * b[, 2] - a[, 2] * b[, 1]
+  )
 }
 
 
@@ -648,7 +561,7 @@ len <- function(X) {
 #' References:
 #'   Vallado: 2022, p. 78, Algorithm 5
 #'
-#' @param ecc eccentricity of the orbit
+#' @param ecc eccentricity of the orbit (vectorised with `nu`)
 #' @param nu true anomaly \[rad\]
 #' @param parabolic_lim_deg paraboloic limit \[deg\], default is 168
 #'
@@ -657,44 +570,58 @@ len <- function(X) {
 #'            * `m`` = mean anomaly \[rad\]
 #'
 newtonnu <- function(ecc, nu, parabolic_lim_deg = 168) {
-  e0 <- Inf
-  m <- Inf
+  n <- max(length(ecc), length(nu))
+  ecc <- rep_len(ecc, n)
+  nu <- rep_len(nu, n)
+  e0 <- rep(Inf, n)
+  m <- rep(Inf, n)
 
-  if (abs(ecc) < SMALL) {
-    # Circular case
-    e0 <- nu
-    m <- nu
-  } else if (ecc < (1 - SMALL)) {
-    # Elliptical case
-    sine <- (sqrt(1 - ecc^2) * sin(nu)) / (1 + ecc * cos(nu))
-    cose <- (ecc + cos(nu)) / (1 + ecc * cos(nu))
-    e0 <- atan2(sine, cose)
-    m <- e0 - ecc * sin(e0)
-  } else if (ecc > (1 + SMALL)) {
-    # Hyperbolic case
-    if ((ecc > 1) && (abs(nu) < (pi - acos(1 / ecc)))) {
-      sine <- (sqrt(ecc^2 - 1) * sin(nu)) / (1 + ecc * cos(nu))
-      e0 <- asinh(sine)
-      m <- ecc * sinh(e0) - e0
-    }
-  } else {
-    # Parabolic case``
-    if (abs(nu) < (parabolic_lim_deg * pi / 180)) {
-      e0 <- tan(nu / 2)
-      m <- e0 + (e0^3) / 3
-    }
+  circ <- abs(ecc) < SMALL
+  ell <- !circ & ecc < (1 - SMALL)
+  hyp <- ecc > (1 + SMALL)
+  par <- !circ & !ell & !hyp
+
+  # Circular case
+  e0[circ] <- nu[circ]
+  m[circ] <- nu[circ]
+
+  # Elliptical case
+  if (any(ell)) {
+    e <- ecc[ell]
+    v <- nu[ell]
+    sine <- (sqrt(1 - e^2) * sin(v)) / (1 + e * cos(v))
+    cose <- (e + cos(v)) / (1 + e * cos(v))
+    e0[ell] <- atan2(sine, cose)
+    m[ell] <- e0[ell] - e * sin(e0[ell])
   }
 
-  # Update eccentric and mean anomaly to be within (0, 2pi) range
-  if (ecc < 1) {
-    m <- fmod(m, 2 * pi)
-    if (m < 0) {
-      m <- m + 2 * pi
-    }
-    e0 <- fmod(e0, 2 * pi)
+  # Hyperbolic case, only within the asymptotes
+  hyp_ok <- hyp & (abs(nu) < (pi - acos(1 / pmax(ecc, 1))))
+  if (any(hyp_ok)) {
+    e <- ecc[hyp_ok]
+    v <- nu[hyp_ok]
+    sine <- (sqrt(e^2 - 1) * sin(v)) / (1 + e * cos(v))
+    e0[hyp_ok] <- asinh(sine)
+    m[hyp_ok] <- e * sinh(e0[hyp_ok]) - e0[hyp_ok]
   }
 
-  return(list(e0 = e0, m = m))
+  # Parabolic case, only below the parabolic limit
+  par_ok <- par & (abs(nu) < (parabolic_lim_deg * pi / 180))
+  if (any(par_ok)) {
+    e0[par_ok] <- tan(nu[par_ok] / 2)
+    m[par_ok] <- e0[par_ok] + (e0[par_ok]^3) / 3
+  }
+
+  # Update eccentric and mean anomaly to be within (0, 2pi) range.
+  # Non-finite values (outside the hyperbolic/parabolic limits) stay Inf.
+  wrap <- ecc < 1 & is.finite(m)
+  if (any(wrap)) {
+    m[wrap] <- fmod(m[wrap], 2 * pi)
+    m[wrap] <- ifelse(m[wrap] < 0, m[wrap] + 2 * pi, m[wrap])
+    e0[wrap] <- fmod(e0[wrap], 2 * pi)
+  }
+
+  list(e0 = e0, m = m)
 }
 
 #' Universal remainder function

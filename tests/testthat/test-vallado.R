@@ -441,3 +441,154 @@ test_that("newtonnu hyperbolic (test_newtone case, corrected sign)", {
   expect_equal(res$e0, 123.45 * pi / 180)
   expect_equal(res$m, 2.3123894903995055)
 })
+
+# Vectorisation ------------------------------------------------------------
+
+# a fixed batch covering every orbit type: circular inclined/equatorial,
+# elliptical inclined/equatorial (prograde and retrograde), hyperbolic
+vec_elements <- function() {
+  deg <- pi / 180
+  list(
+    p = c(8291.6435, 14669.7177, 12246.023, 27152.114, 9471.4065, 20000, 20000),
+    ecc = c(0, 0, 0.2, 0.1, 0.1, 1.5, 1.5),
+    incl = c(50, 180, 30, 180, 170, 30, 0) * deg,
+    raan = c(80, 0, 30, 0, 300, 40, 0) * deg,
+    argp = c(0, 0, 220, 0, 25, 50, 0) * deg,
+    nu = c(0, 0, 65, 115, 315, 108.385, 108.385) * deg,
+    arglat = c(45, 0, 0, 0, 0, 0, 0) * deg,
+    truelon = c(0, 65, 0, 0, 0, 0, 0) * deg,
+    lonper = c(0, 0, 0, 240, 0, 0, 70) * deg
+  )
+}
+
+test_that("coe2rv batch matches row-by-row scalar calls", {
+  els <- vec_elements()
+  batch <- do.call(coe2rv, els)
+
+  expect_equal(dim(batch$r), c(7L, 3L))
+  expect_equal(colnames(batch$r), c("i", "j", "k"))
+  expect_equal(colnames(batch$v), c("vi", "vj", "vk"))
+  for (j in seq_along(els$p)) {
+    one <- do.call(coe2rv, lapply(els, `[[`, j))
+    expect_equal(batch$r[j, ], one$r)
+    expect_equal(batch$v[j, ], one$v)
+  }
+})
+
+test_that("coe2rv recycles length-1 elements and rejects other lengths", {
+  arglats <- c(0, pi / 2, pi)
+  res <- coe2rv(
+    p = 7000,
+    ecc = 0,
+    incl = pi / 4,
+    raan = 0,
+    argp = 0,
+    arglat = arglats
+  )
+  expect_equal(nrow(res$r), 3L)
+  expect_equal(unname(res$r[, "k"]), 7000 * sin(arglats) * sin(pi / 4))
+
+  expect_error(
+    coe2rv(
+      p = 7000,
+      ecc = c(0.1, 0.2),
+      incl = 0.5,
+      raan = 0,
+      argp = 0,
+      nu = c(0, 1, 2)
+    ),
+    "common length"
+  )
+})
+
+test_that("rv2coe batch matches row-by-row scalar calls", {
+  sv <- do.call(coe2rv, vec_elements())
+  batch <- rv2coe(r = sv$r, v = sv$v)
+
+  expect_equal(lengths(batch), rep(7L, 12), ignore_attr = TRUE)
+  for (j in seq_len(nrow(sv$r))) {
+    one <- rv2coe(r = sv$r[j, ], v = sv$v[j, ])
+    expect_equal(lapply(batch, `[[`, j), one)
+  }
+  expect_equal(
+    batch$orbit_type,
+    c(
+      "circular_inclined", "circular_equatorial", "eph_inclined",
+      "eph_equatorial", "eph_inclined", "eph_inclined", "eph_equatorial"
+    )
+  )
+  expect_error(
+    rv2coe(r = sv$r, v = sv$v[1:3, ]),
+    "same number of rows"
+  )
+})
+
+test_that("coe2rv -> rv2coe -> coe2rv batch round trip", {
+  sv <- do.call(coe2rv, vec_elements())
+  el <- rv2coe(r = sv$r, v = sv$v)
+  # undefined elements are NA; coe2rv ignores them for those orbit types
+  na0 <- function(x) ifelse(is.na(x), 0, x)
+  back <- coe2rv(
+    p = el$p,
+    ecc = el$ecc,
+    incl = el$incl,
+    raan = na0(el$raan),
+    argp = na0(el$argp),
+    nu = na0(el$nu),
+    arglat = na0(el$arglat),
+    truelon = na0(el$truelon),
+    lonper = na0(el$lonper)
+  )
+  expect_equal(back$r, sv$r)
+  expect_equal(back$v, sv$v)
+})
+
+test_that("newtonnu batch matches scalar calls across orbit classes", {
+  ecc <- c(0, 0.1, 0.4, 1, 1.05, 1.5)
+  nu <- c(0.7, 45 * pi / 180, 2.0, 1.1949025292471007, 2.752304611108218, 1.8916928725677562)
+  batch <- newtonnu(ecc, nu)
+  for (j in seq_along(ecc)) {
+    one <- newtonnu(ecc[j], nu[j])
+    expect_equal(batch$e0[j], one$e0)
+    expect_equal(batch$m[j], one$m)
+  }
+})
+
+test_that("newtonnu leaves m = Inf beyond the parabolic limit (no error)", {
+  # ecc rounding just below 1 used to reach `if (m < 0)` with m = Inf/NA
+  nu <- 170 * pi / 180 # beyond the 168 deg parabolic limit
+  for (ecc in c(1, 1 - 1e-12, 1 + 1e-12)) {
+    res <- newtonnu(ecc, nu)
+    expect_equal(res$m, Inf)
+    expect_equal(res$e0, Inf)
+  }
+  # hyperbolic nu beyond the asymptote also stays Inf
+  expect_equal(newtonnu(1.5, 2.5)$m, Inf)
+})
+
+test_that("rv2coe parabolic state beyond the parabolic limit returns m = Inf", {
+  sv <- coe2rv(
+    p = 20000,
+    ecc = 1,
+    incl = pi / 4,
+    raan = 0,
+    argp = 0,
+    nu = -170 * pi / 180
+  )
+  res <- rv2coe(r = sv$r, v = sv$v)
+  expect_equal(res$ecc, 1)
+  expect_equal(res$m, Inf)
+})
+
+test_that("determine_orbit_type is vectorised", {
+  expect_equal(
+    determine_orbit_type(
+      ecc = c(0, 0, 0.5, 0.5, 0.5),
+      incl = c(0, 0.3, 0, pi, 0.3)
+    ),
+    c(
+      "circular_equatorial", "circular_inclined", "eph_equatorial",
+      "eph_equatorial", "eph_inclined"
+    )
+  )
+})
