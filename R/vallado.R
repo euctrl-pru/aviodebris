@@ -7,22 +7,22 @@
 #' The additional orbital elements provide calculations for perfectly circular
 #' and equatorial orbits.
 #'
-#' @param p semilatus rectum, `p`, [km]
-#' @param ecc eccentricity, `e`, [unitless]
-#' @param incl inclination, `i`, \eqn{[0, \pi]} [rad]
+#' @param p semilatus rectum, `p`, \[km\]
+#' @param ecc eccentricity, `e`, \[unitless\]
+#' @param incl inclination, `i`, \eqn{[0, \pi]} \[rad\]
 #' @param raan right ascension of ascending node, i.e. the longitude of
 #'             the ascending node, `\eqn{\Omega}`
-#' @param argp argument of perigee, `\eqn{\omega}`, \eqn{[0, 2\pi]} [rad]
-#' @param nu true anomaly, `\eqn{\nu}`, \eqn{[0, 2\pi]} [rad]
+#' @param argp argument of perigee, `\eqn{\omega}`, \eqn{[0, 2\pi]} \[rad\]
+#' @param nu true anomaly, `\eqn{\nu}`, \eqn{[0, 2\pi]} \[rad\]
 #' @param arglat argument of latitude (for circular inclined orbit),
-#'               \eqn{[0, 2\pi]} [rad]
+#'               \eqn{[0, 2\pi]} \[rad\]
 #' @param truelon true longitude (for circular equatorial orbit),
-#'               \eqn{[0, 2\pi]} [rad]
+#'               \eqn{[0, 2\pi]} \[rad\]
 #' @param lonper longitude of periapsis (for elliptical equatorial orbit),
-#'               \eqn{[0, 2\pi]} [rad]
-#' @param mu gravitational parameter, default to Earth's, [km^3/s^2]
+#'               \eqn{[0, 2\pi]} \[rad\]
+#' @param mu gravitational parameter, default to Earth's, \[km^3/s^2\]
 #'
-#' @returns a list of 2 vectors, `r` [km] and `v` [km/s] with named components
+#' @returns a list of 2 vectors, `r` \[km\] and `v` \[km/s\] with named components
 #'          `i`, `j`, and `k`, and `vi`, `vj` and `vk` respectively.
 #' @export
 #'
@@ -103,23 +103,23 @@ coe2rv <- function(
 #'
 #' From Vallado, Algorithm 9
 #'
-#' @param r Position vector [km]
-#' @param v Velocity vector [km/s]
-#' @param mu gravitational parameter, default to Earth's, [km^3/s^2]
+#' @param r Position vector \[km\]
+#' @param v Velocity vector \[km/s\]
+#' @param mu gravitational parameter, default to Earth's, \[km^3/s^2\]
 #'
 #' @returns a list of named items, (`p`, `a`, `ecc`, `incl`, `raan`, `argp`,
 #'          `nu`, `m`, `arglat`, `truelon`, `lonper`, `orbit_type`), where
-#'          * `p`  = semilatus rectum [km]
-#'          * `a` = semimajor axis [km]
+#'          * `p`  = semilatus rectum \[km\]
+#'          * `a` = semimajor axis \[km\]
 #'          * `ecc` = eccentricity
-#'          * `incl` = inclination [rad (0—2π)]
-#'          * `raan` = right ascension of the ascending node [rad (0—2π)]
-#'          * `argp` = argument of perigee [rad (0—2π)]
-#'          * `nu` = true anomaly [rad (0—2π)]
-#'          * `m` = mean anomaly [rad (0—2π)]
-#'          * `arglat` = argument of latitude [rad (0—2π)]
-#'          * `truelon` = true longitude [rad (0—2π)]
-#'          * `lonper` = longitude of periapsis [rad (0—2π)]
+#'          * `incl` = inclination \[rad (0—2π)\]
+#'          * `raan` = right ascension of the ascending node \[rad (0—2π)\]
+#'          * `argp` = argument of perigee \[rad (0—2π)\]
+#'          * `nu` = true anomaly \[rad (0—2π)\]
+#'          * `m` = mean anomaly \[rad (0—2π)\]
+#'          * `arglat` = argument of latitude \[rad (0—2π)\]
+#'          * `truelon` = true longitude \[rad (0—2π)\]
+#'          * `lonper` = longitude of periapsis \[rad (0—2π)\]
 #'          * `orbit_type` = type of orbit such as
 #'             - "circular_equatorial"
 #'             - "circular_inclined"
@@ -314,7 +314,7 @@ rv2coe <- function(r, v, mu = GRAVITATIONAL_CONSTANT_EARTH) {
 #' Rotate a vector about the 1st axis
 #'
 #' @param vec a 3D vector to rotate
-#' @param theta the angle of rotation [rad]
+#' @param theta the angle of rotation \[rad\]
 #'
 #' @returns a 3D vector
 #'
@@ -391,13 +391,13 @@ mag <- function(x) {
 #'
 #' This function finds both geodetic and geocentric latitude.
 #'
-#' @param r ECEF (I, J, K) position vector [km]
+#' @param r ECEF (I, J, K) position vector \[km\]
 #'
 #' @returns a list of the following named values
-#'          * `latgc`: geocentric latitude of satellite, \eqn{[-\pi/2, \pi/2]} [rad]
-#'          * `latgd`: geodetic latitude of satellite, \eqn{[-\pi/2, \pi/2]} [rad]
-#'          * `lon`: longitude of satellite, \eqn{[-\pi, \pi]} [rad]
-#'          * `hellp`: height above the ellipsoid, [km]
+#'          * `latgc`: geocentric latitude of satellite, \eqn{[-\pi/2, \pi/2]} \[rad\]
+#'          * `latgd`: geodetic latitude of satellite, \eqn{[-\pi/2, \pi/2]} \[rad\]
+#'          * `lon`: longitude of satellite, \eqn{[-\pi, \pi]} \[rad\]
+#'          * `hellp`: height above the ellipsoid, \[km\]
 #' @export
 #'
 #' @examples
@@ -473,13 +473,13 @@ ecef2ll <- function(r) {
 #' Algorithm by Borkowski, K. M. 1989. "Accurate Algorithms to Transform
 #' Geocentric to Geodetic Coordinates." Bulletin Geodesique Vol. 63: 50-56.
 #'
-#' @param r ECEF (I, J, K) position vector [km]
+#' @param r ECEF (I, J, K) position vector \[km\]
 #'
 #' @returns a list of the following named values
-#'          * `latgc`: geocentric latitude of satellite, \eqn{[-\pi/2, \pi/2]} [rad]
-#'          * `latgd`: geodetic latitude of satellite, \eqn{[-\pi/2, \pi/2]} [rad]
-#'          * `lon`: longitude of satellite, \eqn{[-\pi, \pi]} [rad]
-#'          * `hellp`: height above the ellipsoid, [km]
+#'          * `latgc`: geocentric latitude of satellite, \eqn{[-\pi/2, \pi/2]} \[rad\]
+#'          * `latgd`: geodetic latitude of satellite, \eqn{[-\pi/2, \pi/2]} \[rad\]
+#'          * `lon`: longitude of satellite, \eqn{[-\pi, \pi]} \[rad\]
+#'          * `hellp`: height above the ellipsoid, \[km\]
 #' @export
 #'
 #' @examples
@@ -557,7 +557,7 @@ interval_modulus <- function(x, a, b) {
 #' Determine the type of orbit based on eccentricity and inclination
 #'
 #' @param ecc the eccentricity of the orbit
-#' @param incl the inclination of the orbit [rad]
+#' @param incl the inclination of the orbit \[rad\]
 #' @param tol SMALL value for tolerance
 #'
 #' @returns a type of orbit such as
@@ -593,7 +593,7 @@ clip <- function(x, lower, upper) {
 #'
 #' This function computes the angle between two vectors using the dot product
 #' and the magnitudes of the vectors. The function handles cases where the dot
-#' product might slightly exceed the interval [-1, 1] due to numerical
+#' product might slightly exceed the interval \[-1, 1\] due to numerical
 #' precision issues by clipping the value. If either vector has zero
 #' magnitude, the function returns `NaN`to indicate that the angle is not
 #' computable.
@@ -601,12 +601,9 @@ clip <- function(x, lower, upper) {
 #' @param v1 a vector
 #' @param v2 a vector
 #'
-#' @returns the angle between two vectors [rad], NaN if either vector is zero
+#' @returns the angle between two vectors \[rad\], NaN if either vector is zero
 #'
-#' @export
-#' @examples
-#' \dontrun{
-#' }
+#' @noRd
 angle <- function(v1, v2) {
   #  mag_v1 = np.linalg.norm(v1)
   mag_v1 <- v1 |> as.matrix() |> norm("F")
@@ -652,12 +649,12 @@ len <- function(X) {
 #'   Vallado: 2022, p. 78, Algorithm 5
 #'
 #' @param ecc eccentricity of the orbit
-#' @param nu true anomaly [rad]
-#' @param parabolic_lim_deg paraboloic limit [deg], default is 168
+#' @param nu true anomaly \[rad\]
+#' @param parabolic_lim_deg paraboloic limit \[deg\], default is 168
 #'
 #' @returns list(e0, m)
-#'            * `e0` = eccentric anomaly [rad]
-#'            * `m`` = mean anomaly [rad]
+#'            * `e0` = eccentric anomaly \[rad\]
+#'            * `m`` = mean anomaly \[rad\]
 #'
 newtonnu <- function(ecc, nu, parabolic_lim_deg = 168) {
   e0 <- Inf
@@ -702,7 +699,7 @@ newtonnu <- function(ecc, nu, parabolic_lim_deg = 168) {
 
 #' Universal remainder function
 #'
-#' @description Given a [xmin,xmax[ or ]xmin,xmax] interval, this function
+#' @description Given a `[xmin, xmax[` or `]xmin, xmax]` interval, this function
 #' determines the remainder of each numeric relative to this interval. In other
 #' words if the interval was repeated over the whole numeric domain, this
 #' function determines where each value would be positioned in a given
@@ -710,9 +707,9 @@ newtonnu <- function(ecc, nu, parabolic_lim_deg = 168) {
 #'
 #' @param x vector of floating point numbers
 #' @param xmax,xmin the limits of the interval
-#' @param bounds how to deal with boundaries (right- or left-open; '[['
-#' or ']]')
-#' @seealso \code{\link{incfix}}, \code{\link{dipfix}} and \code{\link{transphere}}
+#' @param bounds how to deal with boundaries (right- or left-open; `"[["`
+#' or `"]]"`)
+#' Adapted from `StratigrapheR::fmod()`.
 #' @examples
 #' fmod(c(1260.23,360),360)
 #'
@@ -720,7 +717,7 @@ newtonnu <- function(ecc, nu, parabolic_lim_deg = 168) {
 #'
 #' fmod(c(1260.23,360),360 + 180, 180)
 #'
-#' @export
+#' @noRd
 fmod <- function(x, xmax, xmin = 0, bounds = "[[") {
   b <- rebound(bounds)
 
@@ -764,7 +761,7 @@ fmod <- function(x, xmax, xmin = 0, bounds = "[[") {
 #' @return a simplified vector of boundary indicators (\code{"[]"}, \code{"[["},
 #' \code{"]]"} and \code{"]["} only)
 #'
-#' @seealso \code{\link{as.lim}}
+#' Adapted from `StratigrapheR::rebound()`.
 #'
 #' @examples
 #' bounds <- c("[]", "[)", "(]", "()",
@@ -775,7 +772,7 @@ fmod <- function(x, xmax, xmin = 0, bounds = "[[") {
 #'
 #' rebound(bounds)
 #'
-#' @export
+#' @noRd
 
 rebound <- function(b, na.errors = F) {
   cond <- (isTRUE(na.errors) | isFALSE(na.errors))

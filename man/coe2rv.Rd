@@ -5,21 +5,32 @@
 \title{Find the position and velocity vectors in geocentric equatorial (ijk) system
 given the classical orbit elements}
 \usage{
-coe2rv(p, ecc, incl, raan, argp, nu, arglat = NA, truelon = NA, lonper = NA)
+coe2rv(
+  p,
+  ecc,
+  incl,
+  raan,
+  argp,
+  nu = 0,
+  arglat = 0,
+  truelon = 0,
+  lonper = 0,
+  mu = GRAVITATIONAL_CONSTANT_EARTH
+)
 }
 \arguments{
-\item{p}{semilatus rectum, `p`, [km]}
+\item{p}{semilatus rectum, \code{p}, [km]}
 
-\item{ecc}{eccentricity, `e`, [unitless]}
+\item{ecc}{eccentricity, \code{e}, [unitless]}
 
-\item{incl}{inclination, `i`, \eqn{[0, \pi]} [rad]}
+\item{incl}{inclination, \code{i}, \eqn{[0, \pi]} [rad]}
 
 \item{raan}{right ascension of ascending node, i.e. the longitude of
-the ascending node, `\eqn{\Omega}`}
+the ascending node, \verb{\eqn{\Omega}}}
 
-\item{argp}{argument of perigee, `\eqn{\omega}`, \eqn{[0, 2\pi]} [rad]}
+\item{argp}{argument of perigee, \verb{\eqn{\omega}}, \eqn{[0, 2\pi]} [rad]}
 
-\item{nu}{true anomaly, `\eqn{\nu}`, \eqn{[0, 2\pi]} [rad]}
+\item{nu}{true anomaly, \verb{\eqn{\nu}}, \eqn{[0, 2\pi]} [rad]}
 
 \item{arglat}{argument of latitude (for circular inclined orbit),
 \eqn{[0, 2\pi]} [rad]}
@@ -29,10 +40,12 @@ the ascending node, `\eqn{\Omega}`}
 
 \item{lonper}{longitude of periapsis (for elliptical equatorial orbit),
 \eqn{[0, 2\pi]} [rad]}
+
+\item{mu}{gravitational parameter, default to Earth's, [km^3/s^2]}
 }
 \value{
-a list of 2 vectors, `r` [km] and `v` [km/s] with named components
-         `i`, `j`, and `k`, and `vi`, `vj` and `vk` respectively.
+a list of 2 vectors, \code{r} [km] and \code{v} [km/s] with named components
+\code{i}, \code{j}, and \code{k}, and \code{vi}, \code{vj} and \code{vk} respectively.
 }
 \description{
 The additional orbital elements provide calculations for perfectly circular
@@ -40,12 +53,12 @@ and equatorial orbits.
 }
 \examples{
 \dontrun{
-p <- 11067.790 |> units::set_units("km") # km
-ecc <- 0.83285 |> units::as_units()
-incl <- 87.87 |> units::set_units("degree")
-raan <- 227.89 |> units::set_units("degree")
-argp <- 53.38 |> units::set_units("degree")
-nu <- 92.335 |> units::set_units("degree")
+p <- 11067.790 # km
+ecc <- 0.83285
+incl <- 87.87 * pi / 180 # rad
+raan <- 227.89 * pi / 180 # rad
+argp <- 53.38 * pi / 180
+nu <- 92.335 * pi / 180
 
 coe2rv(p, ecc, incl, raan, argp, nu)
 }

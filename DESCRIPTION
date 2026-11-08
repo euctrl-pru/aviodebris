@@ -1,7 +1,7 @@
 Package: aviodebris
 Type: Package
 Title: Estimate impact of space debris reentries on aviation
-Version: 0.1.27
+Version: 0.2.3
 Authors@R: 
     c(person(given = "Enrico",
              family = "Spinielli",
@@ -17,34 +17,36 @@ Description: Functions to help prepare the data and plots for the DASC 2025 pape
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.3.2
+Roxygen: list(markdown = TRUE)
 Imports: 
     arrow,
     cli,
-    DBI,
     dplyr,
-    duckdb,
     ggplot2,
     giscoR,
     h3jsr,
+    h3o,
     here,
     lubridate,
     magrittr,
-    polite,
     pracma,
     purrr,
     rlang,
-    rvest,
     sf,
     smoothr,
     stringr,
     tibble,
     tidyr,
-    trrrj,
-    units,
-    withr
+    trrrj
 Depends: 
-    R (>= 3.5)
+    R (>= 4.1)
+URL: https://euctrl-pru.github.io/aviodebris/
 Suggests: 
-    testthat (>= 3.0.0)
+    polite,
+    rvest,
+    testthat (>= 3.0.0),
+    units
+Remotes:
+    github::euctrl-pru/trrrj
 Config/testthat/edition: 3
+Config/roxygen2/version: 8.1.0

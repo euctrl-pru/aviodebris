@@ -4,11 +4,10 @@
 #' @param session `polite` session
 #'
 #' @returns a dataframe of aircraft info
-#' @export
 #'
 #' @examples
 #' \dontrun{
-#' host <- "https://contentzone.eurocontrol.int/"
+#' host <- "https://learningzone.eurocontrol.int/ilp/customs/ATCPFDB/details.aspx"
 #' session <- polite::bow(host, force = TRUE)
 #' scraper <- purrr::partial(scrape_aircraft_type_info_perfdb,
 #'                           session = session)
@@ -39,11 +38,12 @@ scrape_aircraft_type_info_perfdb <- function(ac_type, session) {
   full_url <- polite::nod(
     session,
     stringr::str_glue(
-      "aircraftperformance/details.aspx?ICAO={ac_type}",
+      "ilp/customs/ATCPFDB/details.aspx?ICAO={ac_type}",
       ac_type = toupper(ac_type)
     )
   )
-  page <- full_url |> polite::scrape()
+  # page <- full_url |> polite::scrape()
+  page <- full_url$url |> rvest::read_html() # be unpolite and scrape despite robots.txt
 
   icao <- ac_type |> toupper()
   if (
@@ -168,7 +168,6 @@ scrape_aircraft_type_info_perfdb <- function(ac_type, session) {
 #' @inheritParams scrape_aircraft_type_info_perfdb
 #'
 #' @returns a dataframe of aircraft info
-#' @export
 #'
 #' @examples
 #' \dontrun{
@@ -342,7 +341,6 @@ scrape_aircraft_type_info_skybrary <- function(ac_type, session) {
 #' @inheritParams scrape_aircraft_type_info_perfdb
 #'
 #' @returns a dataframe of aircraft info
-#' @export
 #'
 #' @examples
 #' \dontrun{

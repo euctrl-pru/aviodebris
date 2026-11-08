@@ -1,4 +1,4 @@
-#' reasample a day of trajectories at 30s
+#' resample a day of trajectories at interval
 #'
 #' @param day the date for the trajectories, it refers to the relevant
 #'            parquet file in `data-raw/trjs/trjs_<YYYY-MM-DD>.parquet`
@@ -6,23 +6,20 @@
 #' @param interval number of seconds between samples [30]
 #'
 #' @export
-#'
-#' @returns a data frame of resampled points is saved in
-#'          `data/trajectories_<YYYY-MM-DD>_resampled_30s.parquet`
+#' @noMd
+#' @returns (invisibly) a data frame of resampled points. Called for its side
+#'          effect of writing
+#'          `data/trajectories_<YYYY-MM-DD>_resampled_<interval>s.parquet`
 #'
 resample_traffic <- function(day, interval = 30L) {
-  date <- day |> lubridate::as_date()
+  date <- day |> lubridate::as_date() |> format("%Y-%m-%d")
+  fi <- stringr::str_glue("trjs_{date}.parquet")
+  fo <- stringr::str_glue("trajectories_{date}_resampled_{interval}s.parquet")
 
-  here::here(
-    "data-raw",
-    "trjs",
-    stringr::str_glue("trjs_{date}.parquet", date = format(date, "%Y-%m-%d"))
-  ) |>
+  out <- here::here("data-raw", "trjs", fi) |>
     arrow::read_parquet() |>
-    dplyr::select(-c("callsign", "icao24")) |>
-    trrrj::resample(interval) |>
-    arrow::write_parquet(here::here(
-      "data",
-      stringr::str_glue("trajectories_{date}_resampled_{interval}s.parquet")
-    ))
+    trrrj::resample(interval)
+
+  arrow::write_parquet(out, here::here("data", fo))
+  invisible(out)
 }

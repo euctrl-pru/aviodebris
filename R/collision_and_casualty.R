@@ -3,36 +3,29 @@
 #' @param day date to calculate for
 #' @param resolution H3 hex resolution
 #'
-#' @returns save the result in a parquet file `collision_and_casualty_hourly.parquet`
+#' @returns (invisibly) a data frame with hourly `collision_expectation` and
+#'          `casualty_risk` per cell. Called for its side effect of writing
+#'          `data/collision_and_casualty_<YYYY-MM-DD>_res_<resolution>_hourly.parquet`.
 #' @export
 #'
 collision_and_casualty_risk_expectation_hourly <- function(
   day,
   resolution = 3L
 ) {
-  date <- day |> lubridate::as_date()
+  date <- day |> lubridate::as_date() |> format("%Y-%m-%d")
+  fi <- stringr::str_glue(
+    "traffic_density_{date}_res_{resolution}_hourly.parquet"
+  )
+  fo <- stringr::str_glue(
+    "collision_and_casualty_{date}_res_{resolution}_hourly.parquet"
+  )
 
-  arrow::read_parquet(
-    here::here(
-      "data",
-      stringr::str_glue(
-        "traffic_density_{date}_res_{resolution}_hourly.parquet"
-      )
-    )
-  ) |>
+  out <- here::here("data", fi) |>
+    arrow::read_parquet() |>
     dplyr::filter(.data$h3_resolution == resolution) |>
     dplyr::left_join(
       aviodebris::weightings_h3_resolution_3_hourly,
       by = c("cell" = stringr::str_glue("h3_resolution_{resolution}"))
-    ) |>
-    # per cell per hour per aircraft type
-    dplyr::group_by(
-      .data$year,
-      .data$month,
-      .data$day,
-      .data$hour,
-      .data$cell,
-      .data$aircraft_type
     ) |>
     dplyr::summarise(
       # take the mean of the half degree values
@@ -40,49 +33,28 @@ collision_and_casualty_risk_expectation_hourly <- function(
       # just take the mean, but values should all be the same
       # this is done to keep the column
       occupancy = mean(.data$occupancy),
-      density_m2 = mean(.data$density_m2)
+      density_m2 = mean(.data$density_m2),
+      .by = c("year", "month", "day", "hour", "cell", "aircraft_type")
     ) |>
-    dplyr::ungroup() |>
     dplyr::left_join(
-      aviodebris::effective_expose_area,
+      aviodebris::effective_exposed_area,
       by = c("aircraft_type" = "icao")
     ) |>
     dplyr::mutate(
       eea = dplyr::if_else(is.na(.data$eea), 500, .data$eea),
       pax = dplyr::if_else(is.na(.data$pax), 7, .data$pax)
     ) |>
-    # per cell per hour per aircraft type
-    dplyr::group_by(
-      .data$year,
-      .data$month,
-      .data$day,
-      .data$hour,
-      .data$cell,
-      .data$aircraft_type
-    ) |>
-    dplyr::summarize(
-      collision_expectation = .data$w * .data$density_m2 * .data$eea
-    ) |>
-    dplyr::ungroup() |>
-    # per cell hourly
-    dplyr::group_by(
-      .data$year,
-      .data$month,
-      .data$day,
-      .data$hour,
-      .data$cell
+    dplyr::summarise(
+      collision_expectation = .data$w * .data$density_m2 * .data$eea,
+      casualty_risk = .data$collision_expectation * .data$pax,
+      .by = c("year", "month", "day", "hour", "cell", "aircraft_type")
     ) |>
     dplyr::summarise(
-      collision_expectation = sum(.data$collision_expectation)
-    ) |>
-    dplyr::ungroup() |>
-    arrow::write_parquet(
-      here::here(
-        "data",
-        stringr::str_glue(
-          "collision_and_casuality_{date}_res_{resolution}_hourly.parquet"
-        )
-      ),
-      compression = "gzip"
+      collision_expectation = sum(.data$collision_expectation),
+      casualty_risk = sum(.data$casualty_risk),
+      .by = c("year", "month", "day", "hour", "cell")
     )
+
+  arrow::write_parquet(out, here::here("data", fo), compression = "gzip")
+  invisible(out)
 }

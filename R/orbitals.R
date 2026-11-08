@@ -7,7 +7,7 @@
 #' @param e  the eccentricity of the orbit
 #' @param i the inclination of the orbit [radians]
 #' @param Omega the Right ascension of the ascending node [radians]
-#' @param w the argument of perigee [radians]
+#' @param w the argument of perigee \[radians\]
 #' @param M the mass of the first body (more massive one), i.e. Earth, [kg]
 #' @param m the mass of the orbiting body (less massive), i.e. satellite, [kg].
 #'          In the case of m << M, m can be passed as 0
@@ -16,7 +16,7 @@
 #'          velocity in a geocentric-equatorial reference system
 #'
 #' @export
-#'
+#' @noMd
 #' @examples
 #' \dontrun{
 #' rE  <- 6378e3 # Earth equatorial radius
@@ -92,7 +92,7 @@ kepler_to_cartesian <- function(
 #'
 #' @returns a tibble of latitudes and values for the density
 #' @export
-#'
+#' @noMd
 #' @examples
 #' \dontrun{
 #' rE  <- 6378e3 # Earth equatorial radius
@@ -142,7 +142,7 @@ latitude_weights <- function(delta_lat, altitude, inclination_deg, n = 10001L) {
         ) |>
           to_tibble(c("i", "j", "k", "vi", "vj", "vk"))
       ) |>
-      tidyr::unnest(.data$cartesian) |>
+      tidyr::unnest(cols = "cartesian") |>
       dplyr::mutate(
         radius = sqrt(
           .data$i * .data$i + .data$j * .data$j + .data$k * .data$k

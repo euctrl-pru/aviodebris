@@ -110,7 +110,7 @@ plot_hexes_map <- function(resolution) {
 
   EUR_res20 <- gisco |>
     sf::st_intersection(eur_hex_union) |>
-    dplyr::select(.data$res)
+    dplyr::select("res")
 
   ggplot2::ggplot() +
     ggplot2::geom_sf(

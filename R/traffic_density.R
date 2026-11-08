@@ -10,19 +10,28 @@
 #'
 #' @export
 #'
-#' @returns save the result in a parquet file
-#'          `traffic_density_<YYYY-MM-DD>_hourly.parquet`
+#' @returns (invisibly) a data frame of hourly `occupancy` and `density_m2`
+#'          per cell and aircraft type. Called for its side effect of writing
+#'          `data/traffic_density_<YYYY-MM-DD>_res_<resolution>_hourly.parquet`
 #'
 traffic_density_hourly <- function(day, resolution = 3L, interval = 30L) {
-  date <- day |> lubridate::as_date()
-  here::here(
-    "data",
-    stringr::str_glue(
-      "trajectories_{date}_resampled_{interval}s_bbox_res_{resolution}.parquet",
-      date = format(date, "%Y-%m-%d")
-    )
-  ) |>
+  dd <- day |> lubridate::as_date()
+  date <- dd |> format("%Y-%m-%d")
+  fi <- stringr::str_glue(
+    "trajectories_{date}_resampled_{interval}s_bbox_res_{resolution}.parquet"
+  )
+  fo <- stringr::str_glue(
+    "traffic_density_{date}_res_{resolution}_hourly.parquet"
+  )
+
+  out <- here::here("data", fi) |>
     arrow::read_parquet() |>
+    dplyr::mutate(
+      year = lubridate::year(.data$timestamp) |> as.integer(),
+      month = lubridate::month(.data$timestamp) |> as.integer(),
+      day = lubridate::day(.data$timestamp) |> as.integer(),
+      hour = lubridate::hour(.data$timestamp) |> as.integer()
+    ) |>
     dplyr::summarise(
       # NOTE: of course 3600 are the seconds in 1 hour
       # occupancy of the cell is `interval` seconds the number of
@@ -44,16 +53,9 @@ traffic_density_hourly <- function(day, resolution = 3L, interval = 30L) {
       cell_area_m2 = h3jsr::cell_area(.data$cell, units = c("m2")),
       density_m2 = .data$occupancy / .data$cell_area_m2
     ) |>
-    dplyr::select(-.data$cell_area_m2) |>
-    dplyr::arrange(.data$occupancy) |>
-    arrow::write_parquet(
-      here::here(
-        "data",
-        stringr::str_glue(
-          "traffic_density_{date}_res_{resolution}_hourly.parquet",
-          date = format(date, "%Y-%m-%d")
-        )
-      ),
-      compression = "gzip"
-    )
+    dplyr::select(-"cell_area_m2") |>
+    dplyr::arrange(.data$occupancy)
+
+  arrow::write_parquet(out, here::here("data", fo), compression = "gzip")
+  invisible(out)
 }

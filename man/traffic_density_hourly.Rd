@@ -9,16 +9,17 @@ traffic_density_hourly(day, resolution = 3L, interval = 30L)
 \arguments{
 \item{day}{the date to calculate the traffic density for;
 it refers to the file
-`trajectories_<YYYY-MM-DD>_resampled_<interval>s_bbox_res_<resolution>.parquet`
-in `data/`}
+\verb{trajectories_<YYYY-MM-DD>_resampled_<interval>s_bbox_res_<resolution>.parquet}
+in \verb{data/}}
 
 \item{resolution}{the resolution of the H3 hexagonal cells}
 
 \item{interval}{resampling interval}
 }
 \value{
-save the result in a parquet file
-         `traffic_density_<YYYY-MM-DD>_hourly.parquet`
+(invisibly) a data frame of hourly \code{occupancy} and \code{density_m2}
+per cell and aircraft type. Called for its side effect of writing
+\verb{data/traffic_density_<YYYY-MM-DD>_res_<resolution>_hourly.parquet}
 }
 \description{
 Calculated the hourly traffic density per aircraft type

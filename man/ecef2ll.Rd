@@ -11,10 +11,10 @@ ecef2ll(r)
 }
 \value{
 a list of the following named values
-         * `latgc`: geocentric latitude of satellite, \eqn{[-\pi/2, \pi/2]} [rad]
-         * `latgd`: geodetic latitude of satellite, \eqn{[-\pi/2, \pi/2]} [rad]
-         * `lon`: longitude of satellite, \eqn{[-\pi, \pi]} [rad]
-         * `hellp`: height above the ellipsoid, [km]
+* \code{latgc}: geocentric latitude of satellite, \eqn{[-\pi/2, \pi/2]} [rad]
+* \code{latgd}: geodetic latitude of satellite, \eqn{[-\pi/2, \pi/2]} [rad]
+* \code{lon}: longitude of satellite, \eqn{[-\pi, \pi]} [rad]
+* \code{hellp}: height above the ellipsoid, [km]
 }
 \description{
 This function finds both geodetic and geocentric latitude.
@@ -25,9 +25,7 @@ r <- c(
   i = 6524.834,
   j = 6862.875,
   k = 6448.296
-) |>
-  units::set_units("km")
-
+)
 res <- ecef2ll(r)
 }
 }
