@@ -11,7 +11,8 @@ latitude_weights(delta_lat, altitude, inclination_deg, n = 10001L)
 
 \item{altitude}{altitude of the orbiting space object [m]}
 
-\item{inclination_deg}{inclination [decimal degrees]}
+\item{inclination_deg}{inclination [decimal degrees], in [0, 180]
+(values above 90 are retrograde)}
 
 \item{n}{number of samples of the orbit}
 }

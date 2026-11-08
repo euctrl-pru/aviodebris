@@ -288,9 +288,8 @@ reentries_gcat <- gcat_base |>
   filter(!(til < start_date), !(end_date < wef)) |>
   rename(inclination = `inc`) |>
   mutate(
+    # GCAT inclination in degrees, [0, 180]; > 90 is retrograde
     inclination = as.numeric(inclination),
-    # normalize latitude to [-90, 90] range
-    inclination = ((inclination + 90) %% 180) - 90,
     NULL
   ) |>
   select(jcat, piece, type, inclination, reentry_date, dry_mass)

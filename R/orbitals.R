@@ -87,7 +87,8 @@ kepler_to_cartesian <- function(
 #'
 #' @param delta_lat delta altitude [decimal degrees]
 #' @param altitude  altitude of the orbiting space object [m]
-#' @param inclination_deg inclination [decimal degrees]
+#' @param inclination_deg inclination [decimal degrees], in [0, 180]
+#'                        (values above 90 are retrograde)
 #' @param n number of samples of the orbit
 #'
 #' @returns a tibble of latitudes and values for the density
@@ -100,6 +101,19 @@ kepler_to_cartesian <- function(
 #' latitude_weights(0.5, rE + alt, 50)
 #' }
 latitude_weights <- function(delta_lat, altitude, inclination_deg, n = 10001L) {
+  if (
+    !is.numeric(inclination_deg) ||
+      length(inclination_deg) != 1 ||
+      is.na(inclination_deg) ||
+      inclination_deg < 0 ||
+      inclination_deg > 180
+  ) {
+    cli::cli_abort(c(
+      "{.arg inclination_deg} must be a single number in [0, 180].",
+      "x" = "Got {.val {inclination_deg}}.",
+      "i" = "Inclinations above 90 are retrograde; do not wrap them to negative values."
+    ))
+  }
   lats <- 90 - seq(delta_lat / 2, 180 - delta_lat / 2, by = delta_lat)
   nlat <- length(lats)
 

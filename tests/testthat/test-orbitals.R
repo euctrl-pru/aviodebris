@@ -29,6 +29,22 @@ test_that("latitude_weights for i=0 is a spike at equator", {
   expect_equal(lw$lat[which.max(lw$val)], 0, tolerance = 0.5)
 })
 
+test_that("latitude_weights rejects inclinations outside [0, 180]", {
+  rE <- 6378e3
+  expect_error(latitude_weights(0.5, rE + 500e3, -82), "\\[0, 180\\]")
+  expect_error(latitude_weights(0.5, rE + 500e3, 180.5), "\\[0, 180\\]")
+  expect_error(latitude_weights(0.5, rE + 500e3, NA_real_), "\\[0, 180\\]")
+  expect_error(latitude_weights(0.5, rE + 500e3, c(10, 20)), "\\[0, 180\\]")
+})
+
+test_that("latitude_weights retrograde inclination mirrors prograde", {
+  rE <- 6378e3
+  expect_identical(
+    latitude_weights(0.5, rE + 500e3, 98),
+    latitude_weights(0.5, rE + 500e3, 82)
+  )
+})
+
 test_that("latitude_weights returns ascending latitudes for all inclinations", {
   rE <- 6378e3
   alt <- 500e3

@@ -22,7 +22,8 @@ Possible prefixes are:
 \item \code{C..[A|M]}: a component, i.e. a functional part of the spacecraft or
 rocket that is deliberately or accidentally ejected.
 }
-\item \code{inclination}: the orbit inclination in the [-90, 90] interval.
+\item \code{inclination}: the orbit inclination in degrees, in the [0, 180] interval
+(values above 90 are retrograde orbits).
 \item \code{reentry_date}: the date of reentry in \href{https://planet4589.org/space/gcat/web/intro/vague.html}{"vague date" format}.
 \item \code{dry_mass}: the (poosibly estimated) dry mass.
 }
