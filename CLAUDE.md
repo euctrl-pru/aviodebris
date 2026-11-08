@@ -166,7 +166,7 @@ Key dependencies:
 
 ### Performance Improvements
 - `plot_hexes_map()`: `hexes_for_bbox_at_res()` called twice with same args
-- `kepler_to_cartesian()`: Already vectorizable, but called row-by-row via `purrr::partial()`
+- ~~`kepler_to_cartesian()`: Already vectorizable, but called row-by-row via `purrr::partial()`~~ ✓ Fixed (`latitude_weights()` now uses vectorised `coe2rv()`; identical output, ~4x faster)
 
 ### Documentation
 - Add vignette showing full workflow

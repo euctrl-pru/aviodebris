@@ -100,69 +100,33 @@ kepler_to_cartesian <- function(
 #' latitude_weights(0.5, rE + alt, 50)
 #' }
 latitude_weights <- function(delta_lat, altitude, inclination_deg, n = 10001L) {
-  twopi <- 2 * pi
-  inclination_rad <- inclination_deg * twopi / 360.0
-  nus <- seq(0, twopi, length.out = n + 1) |>
-    utils::head(-1) |>
-    tibble::as_tibble_col(column_name = "nu") |>
-    dplyr::mutate(inclination = inclination_rad)
-  mSat <- 0.0
-  ecc <- 0.0 # circular orbits
-  Omega <- 0.0 # irrelevant
-  w <- 0.0
-
   lats <- 90 - seq(delta_lat / 2, 180 - delta_lat / 2, by = delta_lat)
   nlat <- length(lats)
-  vals <- vector("numeric", nlat)
 
   if (inclination_deg == 0) {
+    vals <- numeric(nlat)
     vals[1 + nlat / 2] <- 1
-    res <- tibble::tibble(lat = lats, val = vals)
-  } else {
-    to_tibble <- function(x, colnames) {
-      x |>
-        matrix(ncol = length(colnames), dimnames = list(NULL, colnames)) |>
-        dplyr::as_tibble()
-    }
-
-    fff <- purrr::partial(
-      kepler_to_cartesian,
-      a = altitude,
-      e = 0,
-      Omega = Omega,
-      w = w,
-      m = mSat
-    )
-
-    lll <- nus |>
-      dplyr::mutate(
-        cartesian = fff(
-          nu = .data$nu,
-          i = .data$inclination
-        ) |>
-          to_tibble(c("i", "j", "k", "vi", "vj", "vk"))
-      ) |>
-      tidyr::unnest(cols = "cartesian") |>
-      dplyr::mutate(
-        radius = sqrt(
-          .data$i * .data$i + .data$j * .data$j + .data$k * .data$k
-        ),
-        colatitude = acos(.data$k / .data$radius),
-        lat = (0.5 * pi - .data$colatitude) * 360 / twopi,
-        min = pmin(trunc((90 - .data$lat) / delta_lat), nlat - 1),
-        latitude_index = 1 + .data$min,
-        lat = lats[.data$latitude_index],
-        NULL
-      ) |>
-      dplyr::count(.data$lat, name = "val")
-    res <- lats |>
-      tibble::as_tibble_col(column_name = "lat") |>
-      dplyr::left_join(lll, by = "lat") |>
-      dplyr::mutate(
-        val = dplyr::if_else(is.na(.data$val), 0, .data$val),
-        val = .data$val / n
-      ) |>
-      dplyr::arrange(.data$lat)
+    # NOTE: unlike the inclined case, latitudes here stay in descending order
+    return(tibble::tibble(lat = lats, val = vals))
   }
-  return(res)
+
+  # sample n equally spaced positions along a circular inclined orbit;
+  # position is set by the argument of latitude (nu is unused when ecc = 0)
+  r_km <- altitude / 1e3
+  arglats <- seq(0, 2 * pi, length.out = n + 1) |> utils::head(-1)
+  k <- coe2rv(
+    p = r_km,
+    ecc = 0,
+    incl = inclination_deg * pi / 180,
+    raan = 0,
+    argp = 0,
+    arglat = arglats
+  )$r[, "k"]
+
+  # geocentric latitude of each sample, binned into delta_lat bands
+  lat <- asin(clip(k / r_km, -1, 1)) * 180 / pi
+  idx <- 1 + pmin(trunc((90 - lat) / delta_lat), nlat - 1)
+
+  tibble::tibble(lat = lats, val = tabulate(idx, nbins = nlat) / n) |>
+    dplyr::arrange(.data$lat)
 }

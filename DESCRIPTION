@@ -1,23 +1,20 @@
-Package: aviodebris
 Type: Package
+Package: aviodebris
 Title: Estimate impact of space debris reentries on aviation
 Version: 0.2.3
-Authors@R: 
-    c(person(given = "Enrico",
-             family = "Spinielli",
-             role = c("aut", "cre"),
-             email = "enrico.spinielli@eurocontrol.int",
-             comment = c(ORCID = "0000-0001-8584-9131")),
-      person(given = "EUROCONTROL",
-             role = c("cph", "fnd")))
+Authors@R: c(
+    person("Enrico", "Spinielli", , "enrico.spinielli@eurocontrol.int", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0001-8584-9131")),
+    person("EUROCONTROL", role = c("cph", "fnd"))
+  )
 Maintainer: Enrico Spinielli <enrico.spinielli@eurocontrol.int>
-Description: Functions to help prepare the data and plots for the DASC 2025 paper
-      "Preparing for Potential Closure of European Airspaces due to Re-entering
-      Space Objects".
+Description: Functions to help prepare the data and plots for the DASC
+    2025 paper "Preparing for Potential Closure of European Airspaces due
+    to Re-entering Space Objects".
 License: MIT + file LICENSE
-Encoding: UTF-8
-LazyData: true
-Roxygen: list(markdown = TRUE)
+URL: https://euctrl-pru.github.io/aviodebris/
+Depends: 
+    R (>= 4.1)
 Imports: 
     arrow,
     cli,
@@ -29,23 +26,23 @@ Imports:
     here,
     lubridate,
     magrittr,
-    purrr,
     rlang,
     sf,
     smoothr,
     stringr,
     tibble,
-    tidyr,
     trrrj
-Depends: 
-    R (>= 4.1)
-URL: https://euctrl-pru.github.io/aviodebris/
 Suggests: 
     polite,
+    purrr,
     rvest,
     testthat (>= 3.0.0),
+    tidyr,
     units
 Remotes:
     github::euctrl-pru/trrrj
-Config/testthat/edition: 3
 Config/roxygen2/version: 8.1.0
+Config/testthat/edition: 3
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
